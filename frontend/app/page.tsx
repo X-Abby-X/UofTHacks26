@@ -1,65 +1,87 @@
-import Image from "next/image";
+import { db } from '@/drizzle/index';
+import { courses } from '@/drizzle/db/schema';
+import Link from 'next/link';
+import { AddCourseButton } from '@/app/ui/AddCourseButton';
+import { DeleteCourseBtn } from '@/app/ui/DeleteCourseBtn';
+import { Fingerprint, Zap, Sparkles, UserCircle } from 'lucide-react';
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function GlobalHub() {
+  const allCourses = await db.query.courses.findMany();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="p-12 relative min-h-screen bg-[#020617] text-white overflow-x-hidden">
+      {/* NARRATIVE HEADER */}
+      <header className="mb-16 flex justify-between items-end w-full pr-8 relative z-50">
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-4 h-4 text-[#8B5CF6] animate-pulse" />
+            {/* Unified Branding: N3XU$ Identity Protocol */}
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
+              N<span className="text-[#8B5CF6]">3</span>XU<span className="text-[#D946EF]">$</span> // Identity Protocol
+            </span>
+          </div>
+          <h1 className="text-6xl font-black text-white tracking-tighter leading-none">
+            Identity <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B5CF6] to-[#D946EF]">Vaults</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="flex items-center gap-4 relative">
+          <AddCourseButton />
+          <Link href="/user" className="p-3 bg-white/5 rounded-2xl border border-white/10 hover:border-[#8B5CF6]/50 transition-all group shadow-lg shadow-[#8B5CF6]/5">
+            <UserCircle className="w-6 h-6 text-white/40 group-hover:text-[#8B5CF6]" />
+          </Link>
         </div>
-      </main>
-    </div>
+      </header>
+
+      {/* IDENTITY GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
+        {allCourses.map((course) => {
+          const mastery = course.currentGrade || 0;
+          return (
+            <div key={course.id} className="group relative h-full">
+              {/* NAVIGATION LAYER */}
+              <Link href={`/course/${course.id}`} className="block h-full">
+                <div className="h-full p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 backdrop-blur-xl overflow-hidden transition-all hover:border-[#8B5CF6]/50 hover:bg-white/[0.05]">
+                  {/* Persona Glow Aura */}
+                  <div className={`absolute -right-12 -top-12 w-40 h-40 blur-[80px] rounded-full transition-all duration-700 opacity-20 group-hover:opacity-40 ${mastery > 80 ? 'bg-[#8B5CF6]' : 'bg-emerald-500'
+                    }`} />
+
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="p-3 bg-white/5 rounded-2xl border border-white/5 group-hover:scale-110 transition-transform duration-500">
+                        <Fingerprint className="w-6 h-6 text-white/40 group-hover:text-[#8B5CF6]" />
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1">Resonance</span>
+                        <div className="text-2xl font-black text-white">{mastery}%</div>
+                      </div>
+                    </div>
+
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">
+                      {course.name}
+                    </h2>
+
+                    {/* Identity Progress Track */}
+                    <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden mt-4">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] transition-all duration-1000"
+                        style={{ width: `${mastery}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+
+              {/* ACTION LAYER - Purge Course */}
+              <div className="absolute top-6 right-6 z-40 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <DeleteCourseBtn courseId={course.id} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </main>
   );
 }
