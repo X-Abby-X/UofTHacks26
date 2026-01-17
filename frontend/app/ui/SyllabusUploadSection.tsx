@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Loader2, Fingerprint, CheckCircle2, AlertCircle } from 'lucide-react';
 import { processSyllabusAction } from '@/app/lib/actions';
 import { supabase } from '@/drizzle/db/client';

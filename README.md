@@ -31,3 +31,21 @@ API_KEY = "YOUR API KEY"
 
 3. upload pdf in folder called "files" 
 4. ```python main.py```
+
+
+install fastapi
+pip install fastapi uvicorn
+
+
+python -m pip install python-dotenv
+
+npm install drizzle-orm
+
+pip install fastapi "uvicorn[standard]" google-generativeai supabase pydantic python-dotenv psycopg2-binary asyncpg aiohttp python-multipart requests
+npm install postgres
+npm install framer-motion
+npm install lucide-react
+npm install @supabase/supabase-js
+npm install @supabase/auth-helpers-nextjs
+npm install @supabase/supabase-js @supabase/ssr
+npm install recharts react-is
