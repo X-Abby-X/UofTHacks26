@@ -1,6 +1,7 @@
 'use client'; // Required for usePathname and motion hooks
 
-import { motion } from 'motion/react';
+// import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { LayoutDashboard, TrendingUp, FolderOpen, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';

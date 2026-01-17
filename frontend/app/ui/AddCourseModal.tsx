@@ -1,7 +1,9 @@
 // frontend/app/ui/AddCourseModal.tsx
 'use client';
 
-import { motion, AnimatePresence } from 'motion/react';
+// import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion'; // ✅ correct
+
 import { X } from 'lucide-react';
 import { createCourse } from '@/app/lib/actions';
 
