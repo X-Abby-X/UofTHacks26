@@ -1,0 +1,786 @@
+{
+  "questions": [
+    {
+      "question_id": 1,
+      "unit": "Diodes and Diode Circuits",
+      "question_text": "For the circuit shown below, the diodes are ideal. Determine the node voltages VA, VB, and VC, and the currents I1, I2, and I3. Show your work clearly.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            {
+              "type": "V",
+              "label": "15V",
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                0,
+                3
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "R",
+              "label": "5k\u03a9",
+              "start": [
+                0,
+                3
+              ],
+              "end": [
+                3,
+                3
+              ]
+            },
+            {
+              "type": "D",
+              "label": "D1",
+              "start": [
+                3,
+                3
+              ],
+              "end": [
+                3,
+                5
+              ]
+            },
+            {
+              "type": "R",
+              "label": "10k\u03a9",
+              "start": [
+                3,
+                5
+              ],
+              "end": [
+                5,
+                5
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                5,
+                5
+              ],
+              "end": [
+                5,
+                3
+              ],
+              "label": "VA"
+            },
+            {
+              "type": "R",
+              "label": "8k\u03a9",
+              "start": [
+                5,
+                3
+              ],
+              "end": [
+                7,
+                3
+              ]
+            },
+            {
+              "type": "D",
+              "label": "D2",
+              "start": [
+                7,
+                3
+              ],
+              "end": [
+                7,
+                1
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                7,
+                1
+              ]
+            },
+            {
+              "type": "V",
+              "label": "-5V",
+              "start": [
+                10,
+                0
+              ],
+              "end": [
+                10,
+                3
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                10,
+                0
+              ]
+            },
+            {
+              "type": "R",
+              "label": "2k\u03a9",
+              "start": [
+                10,
+                3
+              ],
+              "end": [
+                8,
+                3
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                8,
+                3
+              ],
+              "end": [
+                8,
+                5
+              ],
+              "label": "VB"
+            },
+            {
+              "type": "D",
+              "label": "D3",
+              "start": [
+                8,
+                5
+              ],
+              "end": [
+                8,
+                7
+              ]
+            },
+            {
+              "type": "V",
+              "label": "10V",
+              "start": [
+                8,
+                7
+              ],
+              "end": [
+                8,
+                9
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                8,
+                9
+              ],
+              "end": [
+                6,
+                9
+              ]
+            },
+            {
+              "type": "R",
+              "label": "4k\u03a9",
+              "start": [
+                6,
+                9
+              ],
+              "end": [
+                6,
+                7
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                6,
+                7
+              ],
+              "end": [
+                5,
+                7
+              ],
+              "label": "VC"
+            },
+            {
+              "type": "short",
+              "start": [
+                5,
+                7
+              ],
+              "end": [
+                5,
+                5
+              ],
+              "label": "I1"
+            },
+            {
+              "type": "short",
+              "start": [
+                7,
+                3
+              ],
+              "end": [
+                7,
+                1
+              ],
+              "label": "I2"
+            },
+            {
+              "type": "short",
+              "start": [
+                8,
+                7
+              ],
+              "end": [
+                8,
+                9
+              ],
+              "label": "I3"
+            }
+          ]
+        }
+      },
+      "rendered_image_path": "images\\question_1.png"
+    },
+    {
+      "question_id": 2,
+      "unit": "Diodes and Diode Circuits",
+      "question_text": "For the diode circuit shown, the diode has an `I_S = 0.5 \u03bcA` and `V_T = 26 mV`. The input voltage is `v_in(t) = 5 + 0.01 sin(\u03c9t)` V.\na) Calculate the DC operating current `I_D` and the small-signal resistance `r_d` of the diode.\nb) Determine the output voltage `v_out(t)`.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            {
+              "type": "V",
+              "label": "v_in(t)",
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                0,
+                3
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "R",
+              "label": "1k\u03a9",
+              "start": [
+                0,
+                3
+              ],
+              "end": [
+                3,
+                3
+              ]
+            },
+            {
+              "type": "D",
+              "label": "D1",
+              "start": [
+                3,
+                3
+              ],
+              "end": [
+                3,
+                0
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                3,
+                0
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                3,
+                3
+              ],
+              "end": [
+                5,
+                3
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                5,
+                3
+              ],
+              "end": [
+                5,
+                0
+              ],
+              "label": "v_out(t)"
+            }
+          ]
+        }
+      },
+      "rendered_image_path": "images\\question_2.png"
+    },
+    {
+      "question_id": 3,
+      "unit": "Operational Amplifiers (Op-Amps)",
+      "question_text": "Design a non-inverting amplifier with a voltage gain of 50. The amplifier should be capable of delivering a 5V peak-to-peak signal across a 5k\u03a9 load resistor. The Op-Amp has an output current limit of 2 mA. Draw your circuit, clearly indicating all component values, input port (`v_in`), and output port (`v_out`). Ensure that the Op-Amp operates within its current limits for the specified output.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            {
+              "type": "ground",
+              "start": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "V",
+              "label": "v_in",
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                0,
+                2
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                0,
+                2
+              ],
+              "end": [
+                2,
+                2
+              ]
+            },
+            {
+              "type": "opamp",
+              "label": "OpAmp",
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                7,
+                4
+              ],
+              "pin_plus": [
+                2,
+                2
+              ],
+              "pin_minus": [
+                2,
+                1
+              ],
+              "pin_out": [
+                7,
+                2
+              ]
+            },
+            {
+              "type": "R",
+              "label": "R1",
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                3,
+                0
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                3,
+                0
+              ]
+            },
+            {
+              "type": "R",
+              "label": "Rf",
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                7,
+                2
+              ]
+            },
+            {
+              "type": "R",
+              "label": "RL",
+              "start": [
+                7,
+                2
+              ],
+              "end": [
+                7,
+                0
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                7,
+                0
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                7,
+                2
+              ],
+              "end": [
+                9,
+                2
+              ],
+              "label": "v_out"
+            }
+          ]
+        }
+      },
+      "rendered_image_path": "images\\question_3.png"
+    },
+    {
+      "question_id": 4,
+      "unit": "Diodes and Diode Circuits",
+      "question_text": "Consider the Zener regulator circuit below. The input voltage `V_S` varies from 18 V to 22 V. The Zener diode has `V_Z = 10 V` and `r_z = 0` for `I_Z \u2265 1 mA`. The series resistor `R_S = 400 \u03a9`. If the load current `I_L` is constant at 10 mA, calculate:\na) The minimum Zener current `I_Z_min`.\nb) The maximum power dissipated by the Zener diode `P_Z_max`.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            {
+              "type": "V",
+              "label": "V_S",
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                0,
+                3
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "R",
+              "label": "R_S",
+              "start": [
+                0,
+                3
+              ],
+              "end": [
+                3,
+                3
+              ]
+            },
+            {
+              "type": "D",
+              "label": "Zener",
+              "start": [
+                3,
+                3
+              ],
+              "end": [
+                3,
+                0
+              ],
+              "direction": "up"
+            },
+            {
+              "type": "ground",
+              "start": [
+                3,
+                0
+              ]
+            },
+            {
+              "type": "R",
+              "label": "R_L",
+              "start": [
+                3,
+                3
+              ],
+              "end": [
+                6,
+                3
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                6,
+                3
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                3,
+                3
+              ],
+              "end": [
+                3,
+                5
+              ],
+              "label": "I_L"
+            }
+          ]
+        }
+      },
+      "rendered_image_path": "images\\question_4.png"
+    },
+    {
+      "question_id": 5,
+      "unit": "Operational Amplifiers (Op-Amps)",
+      "question_text": "An inverting amplifier is constructed using an Op-Amp with the following non-ideal characteristics: input offset voltage `V_OS = 3 mV`, input bias currents `I_B1 = 80 nA` and `I_B2 = 70 nA`. The amplifier uses `R_1 = 10 k\u03a9` and `R_f = 100 k\u03a9`. Calculate the worst-case output voltage `V_O` assuming the input `V_in = 0 V`. 'Worst-case' implies the output voltage with the largest positive value.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            {
+              "type": "ground",
+              "start": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "V",
+              "label": "V_in = 0V",
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                0,
+                2
+              ]
+            },
+            {
+              "type": "R",
+              "label": "R1 (10k\u03a9)",
+              "start": [
+                0,
+                2
+              ],
+              "end": [
+                2,
+                2
+              ]
+            },
+            {
+              "type": "opamp",
+              "label": "OpAmp",
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                7,
+                4
+              ],
+              "pin_minus": [
+                2,
+                2
+              ],
+              "pin_plus": [
+                2,
+                1
+              ],
+              "pin_out": [
+                7,
+                2
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                2,
+                1
+              ]
+            },
+            {
+              "type": "R",
+              "label": "Rf (100k\u03a9)",
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                7,
+                2
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                7,
+                2
+              ],
+              "end": [
+                9,
+                2
+              ],
+              "label": "V_O"
+            }
+          ]
+        }
+      },
+      "rendered_image_path": "images\\question_5.png"
+    },
+    {
+      "question_id": 6,
+      "unit": "Diodes and Diode Circuits",
+      "question_text": "For the diode clipping circuit shown, assume ideal diodes (cut-in voltage `V_D_ON = 0V`). The input voltage `v_in(t) = 10 sin(\u03c9t)` V. Sketch the output voltage `v_out(t)` for one full period. Clearly label the clipping levels.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            {
+              "type": "V",
+              "label": "v_in(t)",
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                0,
+                3
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "R",
+              "label": "1k\u03a9",
+              "start": [
+                0,
+                3
+              ],
+              "end": [
+                3,
+                3
+              ]
+            },
+            {
+              "type": "D",
+              "label": "D1",
+              "start": [
+                3,
+                3
+              ],
+              "end": [
+                3,
+                1
+              ]
+            },
+            {
+              "type": "V",
+              "label": "2V",
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                0
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                3,
+                0
+              ]
+            },
+            {
+              "type": "D",
+              "label": "D2",
+              "start": [
+                3,
+                3
+              ],
+              "end": [
+                5,
+                3
+              ]
+            },
+            {
+              "type": "V",
+              "label": "-3V",
+              "start": [
+                5,
+                3
+              ],
+              "end": [
+                5,
+                1
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                5,
+                1
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                3,
+                3
+              ],
+              "end": [
+                7,
+                3
+              ],
+              "label": "v_out(t)"
+            }
+          ]
+        }
+      },
+      "rendered_image_path": "images\\question_6.png"
+    }
+  ]
+}
