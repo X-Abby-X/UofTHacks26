@@ -1,3 +1,92 @@
+
+// VERSION 4
+"use client";
+
+import { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
+
+type Props = {
+  bucket: string;
+  userID: string;
+};
+
+export default function FileUploader({ bucket, userID }: Props) {
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
+
+  const uploadFile = async () => {
+    if (!file) return;
+
+    setUploading(true);
+    setMessage(null);
+    setSignedUrl(null);
+
+    try {
+      const timestamp = Date.now();
+      const filePath = `${userID}/${timestamp}-${file.name}`;
+
+      const { data: { user } } = await supabase.auth.getUser();
+        console.log(user);
+
+      // Upload
+      const { error: uploadError } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file, { upsert: false });
+
+      if (uploadError) {
+        setMessage(`❌ Upload failed: ${uploadError.message}`);
+        return;
+      }
+
+      // Generate signed URL
+      const { data, error: urlError } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(filePath, 300);
+
+      if (urlError) {
+        setMessage(`❌ Signed URL error: ${urlError.message}`);
+        return;
+      }
+
+      setSignedUrl(data.signedUrl);
+      setMessage("✅ File uploaded successfully!");
+
+    } catch (err: any) {
+      setMessage(`❌ Unexpected error: ${err.message}`);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div style={{ border: "1px solid #ccc", padding: "1rem", width: 350 }}>
+      <input
+        type="file"
+        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+      />
+
+      <button
+        onClick={uploadFile}
+        disabled={!file || uploading}
+        style={{ marginTop: "0.5rem" }}
+      >
+        {uploading ? "Uploading..." : "Upload"}
+      </button>
+
+      {message && <p>{message}</p>}
+
+      {signedUrl && (
+        <a href={signedUrl} target="_blank" rel="noopener noreferrer">
+          Open file (5 min)
+        </a>
+      )}
+    </div>
+  );
+}
+
+
 // "use client";
 
 // import { useState } from "react";
@@ -277,90 +366,3 @@
 //     </div>
 //   );
 // }
-
-// VERSION 4
-"use client";
-
-import { useState } from "react";
-import { supabase } from "../lib/supabaseClient";
-
-type Props = {
-  bucket: string;
-  userID: string;
-};
-
-export default function FileUploader({ bucket, userID }: Props) {
-  const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [signedUrl, setSignedUrl] = useState<string | null>(null);
-
-  const uploadFile = async () => {
-    if (!file) return;
-
-    setUploading(true);
-    setMessage(null);
-    setSignedUrl(null);
-
-    try {
-      const timestamp = Date.now();
-      const filePath = `${userID}/${timestamp}-${file.name}`;
-
-      const { data: { user } } = await supabase.auth.getUser();
-        console.log(user);
-
-      // Upload
-      const { error: uploadError } = await supabase.storage
-        .from(bucket)
-        .upload(filePath, file, { upsert: false });
-
-      if (uploadError) {
-        setMessage(`❌ Upload failed: ${uploadError.message}`);
-        return;
-      }
-
-      // Generate signed URL
-      const { data, error: urlError } = await supabase.storage
-        .from(bucket)
-        .createSignedUrl(filePath, 300);
-
-      if (urlError) {
-        setMessage(`❌ Signed URL error: ${urlError.message}`);
-        return;
-      }
-
-      setSignedUrl(data.signedUrl);
-      setMessage("✅ File uploaded successfully!");
-
-    } catch (err: any) {
-      setMessage(`❌ Unexpected error: ${err.message}`);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div style={{ border: "1px solid #ccc", padding: "1rem", width: 350 }}>
-      <input
-        type="file"
-        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-      />
-
-      <button
-        onClick={uploadFile}
-        disabled={!file || uploading}
-        style={{ marginTop: "0.5rem" }}
-      >
-        {uploading ? "Uploading..." : "Upload"}
-      </button>
-
-      {message && <p>{message}</p>}
-
-      {signedUrl && (
-        <a href={signedUrl} target="_blank" rel="noopener noreferrer">
-          Open file (5 min)
-        </a>
-      )}
-    </div>
-  );
-}

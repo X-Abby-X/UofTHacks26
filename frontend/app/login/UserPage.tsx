@@ -8,6 +8,10 @@ export default function UserPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   useEffect(() => {
     // 1. Get initial session
     const getInitialUser = async () => {
@@ -38,6 +42,7 @@ export default function UserPage() {
       }
     );
 
+
     return () => {
       subscription.subscription.unsubscribe();
     };
@@ -52,6 +57,8 @@ export default function UserPage() {
             <h1>User Dashboard</h1>
             <p>Your user ID:</p>
             <code>{userId}</code>
+            <br />
+            <button onClick={signOut}>Sign Out</button>
         </div>
         {userId && 
         <div>
