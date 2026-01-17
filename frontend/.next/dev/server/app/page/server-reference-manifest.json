@@ -1,0 +1,35 @@
+{
+  "node": {
+    "40ccc0a3956a500315848a9343d415371d73d4dcf2": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteCourse",
+          "filename": "app/lib/actions.tsx"
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      },
+      "exportedName": "deleteCourse",
+      "filename": "app/lib/actions.tsx"
+    },
+    "4090343f00ed10f4472b943068f07dc92ce7b193bd": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createCourse",
+          "filename": "app/lib/actions.tsx"
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      },
+      "exportedName": "createCourse",
+      "filename": "app/lib/actions.tsx"
+    }
+  },
+  "edge": {}
+}
