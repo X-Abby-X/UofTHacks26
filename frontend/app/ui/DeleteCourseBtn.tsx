@@ -14,7 +14,7 @@ export function DeleteCourseBtn({ courseId }: { courseId: string }) {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!window.confirm("Purge this identity from the Chronicle?")) return;
+        if (!window.confirm("Purge this identity from the Nexus?")) return;
 
         // This proves the button is receiving the click
         console.log("PURGE BUTTON: Captured click for ID", courseId);

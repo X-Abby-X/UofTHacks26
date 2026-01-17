@@ -57,6 +57,15 @@ export async function processSyllabusAction(courseId: string, publicUrl: string)
             })
             .where(eq(courses.id, courseId));
 
+        // FOR VAULT
+        // 2. NEW: Log the Syllabus in the submissions table so it shows in the Vault
+        await db.insert(submissions).values({
+            courseId: courseId,
+            name: "Official Course Syllabus",
+            // We store the URL in a JSON field if you want easy access later
+            analysisReport: [{ type: "syllabus", url: publicUrl }]
+        });
+
         revalidatePath(`/course/${courseId}`);
         return { success: true };
     } catch (error) {
