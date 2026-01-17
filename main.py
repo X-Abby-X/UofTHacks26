@@ -59,7 +59,7 @@ import os, json
 from google import genai
 from config import API_KEY
 from gemini_client import GeminiFileManager
-from processor import AcademicProcessor, ExamProcessor
+from processor import AcademicProcessor2, ExamProcessor
 from tikz_renderer import render_tikz
 
 def load_questions(json_path: str):
