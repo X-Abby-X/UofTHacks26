@@ -24,8 +24,8 @@ def main():
         syl = mgr.upload_and_wait("files/syllabus.pdf", "Syllabus", "application/pdf")
         sol = mgr.upload_and_wait("files/midtermAnswers.pdf", "Solutions", "application/pdf")
         
-        k_map = procA.extract_knowledge_map(syl)
-        questions = procE.gen_question(k_map, sol)
+        # k_map = procA.extract_knowledge_map(syl)
+        # questions = procE.gen_question(k_map, sol)
         
         # Save them immediately so we have a record
         with open(json_path, "w", encoding="utf-8") as f:
