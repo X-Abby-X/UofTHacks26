@@ -171,7 +171,114 @@
 //   );
 // }
 
-// VERSION 3
+// // VERSION 3
+// "use client";
+
+// import { useState } from "react";
+// import { supabase } from "../lib/supabaseClient";
+
+// type Props = {
+//   bucket: string;
+//   userID: string;
+// };
+
+// export default function FileUploader({ bucket, userID }: Props) {
+//   const [file, setFile] = useState<File | null>(null);
+//   const [uploading, setUploading] = useState(false);
+//   const [message, setMessage] = useState<string | null>(null);
+//   const [signedUrl, setSignedUrl] = useState<string | null>(null);
+
+//   const uploadFile = async () => {
+//     if (!file) return;
+
+//     setUploading(true);
+//     setMessage(null);
+//     setSignedUrl(null);
+
+//     try {
+//       // Make filename safe for URLs
+//       const timestamp = Date.now();
+//       const safeFileName = encodeURIComponent(file.name);
+//         const filePath = `${userID}/${timestamp}-${safeFileName}`;
+
+//       // Upload the file
+//       const { data: uploadData, error: uploadError } = await supabase.storage
+//         .from(bucket)
+//         .upload(filePath, file, {
+//           cacheControl: "3600",
+//           upsert: false,
+//         });
+
+//       if (uploadError) {
+//         setMessage(`❌ Upload failed: ${uploadError.message}`);
+//         return;
+//       }
+
+//       // ✅ Verify the uploaded file exists
+//       const { data: listData, error: listError } = await supabase.storage
+//         .from(bucket)
+//         .list(userID);
+
+//       if (listError) {
+//         setMessage(`❌ Could not verify file: ${listError.message}`);
+//         return;
+//       }
+
+//         const uploadedFileExists = listData.some((f) => f.name === `${timestamp}-${file.name}` || f.name === safeFileName);
+//       if (!uploadedFileExists) {
+//         setMessage(`❌ Uploaded file not found in bucket!`);
+//         return;
+//       }
+
+//       // Generate signed URL (valid 5 minutes)
+//       const { data: urlData, error: urlError } = await supabase.storage
+//         .from(bucket)
+//         .createSignedUrl(filePath, 300);
+
+//       if (urlError) {
+//         setMessage(`❌ Signed URL error: ${urlError.message}`);
+//       } else {
+//         setSignedUrl(urlData.signedUrl);
+//         setMessage("✅ File uploaded and signed URL generated!");
+//       }
+
+//     } catch (err: any) {
+//       setMessage(`❌ Unexpected error: ${err.message}`);
+//     } finally {
+//       setUploading(false);
+//     }
+//   };
+
+//   return (
+//     <div style={{ border: "1px solid #ccc", padding: "1rem", width: 350 }}>
+//       <input
+//         type="file"
+//         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+//       />
+
+//       <button
+//         onClick={uploadFile}
+//         disabled={!file || uploading}
+//         style={{ marginTop: "0.5rem" }}
+//       >
+//         {uploading ? "Uploading..." : "Upload"}
+//       </button>
+
+//       {message && <p style={{ marginTop: "0.5rem" }}>{message}</p>}
+
+//       {signedUrl && (
+//         <div style={{ marginTop: "0.5rem" }}>
+//           <p>Preview URL (expires in 5 min):</p>
+//           <a href={signedUrl} target="_blank" rel="noopener noreferrer">
+//             Open File
+//           </a>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// VERSION 4
 "use client";
 
 import { useState } from "react";
@@ -196,51 +303,34 @@ export default function FileUploader({ bucket, userID }: Props) {
     setSignedUrl(null);
 
     try {
-      // Make filename safe for URLs
       const timestamp = Date.now();
-      const safeFileName = encodeURIComponent(file.name);
-        const filePath = `${userID}/${timestamp}-${safeFileName}`;
+      const filePath = `${userID}/${timestamp}-${file.name}`;
 
-      // Upload the file
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { data: { user } } = await supabase.auth.getUser();
+        console.log(user);
+
+      // Upload
+      const { error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
+        .upload(filePath, file, { upsert: false });
 
       if (uploadError) {
         setMessage(`❌ Upload failed: ${uploadError.message}`);
         return;
       }
 
-      // ✅ Verify the uploaded file exists
-      const { data: listData, error: listError } = await supabase.storage
-        .from(bucket)
-        .list(userID);
-
-      if (listError) {
-        setMessage(`❌ Could not verify file: ${listError.message}`);
-        return;
-      }
-
-        const uploadedFileExists = listData.some((f) => f.name === `${timestamp}-${file.name}` || f.name === safeFileName);
-      if (!uploadedFileExists) {
-        setMessage(`❌ Uploaded file not found in bucket!`);
-        return;
-      }
-
-      // Generate signed URL (valid 5 minutes)
-      const { data: urlData, error: urlError } = await supabase.storage
+      // Generate signed URL
+      const { data, error: urlError } = await supabase.storage
         .from(bucket)
         .createSignedUrl(filePath, 300);
 
       if (urlError) {
         setMessage(`❌ Signed URL error: ${urlError.message}`);
-      } else {
-        setSignedUrl(urlData.signedUrl);
-        setMessage("✅ File uploaded and signed URL generated!");
+        return;
       }
+
+      setSignedUrl(data.signedUrl);
+      setMessage("✅ File uploaded successfully!");
 
     } catch (err: any) {
       setMessage(`❌ Unexpected error: ${err.message}`);
@@ -264,15 +354,12 @@ export default function FileUploader({ bucket, userID }: Props) {
         {uploading ? "Uploading..." : "Upload"}
       </button>
 
-      {message && <p style={{ marginTop: "0.5rem" }}>{message}</p>}
+      {message && <p>{message}</p>}
 
       {signedUrl && (
-        <div style={{ marginTop: "0.5rem" }}>
-          <p>Preview URL (expires in 5 min):</p>
-          <a href={signedUrl} target="_blank" rel="noopener noreferrer">
-            Open File
-          </a>
-        </div>
+        <a href={signedUrl} target="_blank" rel="noopener noreferrer">
+          Open file (5 min)
+        </a>
       )}
     </div>
   );
