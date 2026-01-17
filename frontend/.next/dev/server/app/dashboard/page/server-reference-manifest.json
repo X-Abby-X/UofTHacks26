@@ -1,0 +1,35 @@
+{
+  "node": {
+    "40ba53dae440167d7b869f6a2f7113139e7d697456": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createCourse",
+          "filename": "app/lib/actions.tsx"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "action-browser"
+      },
+      "exportedName": "createCourse",
+      "filename": "app/lib/actions.tsx"
+    },
+    "40bc485c44de37698547712fd8d0965d8416f4b90c": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteCourse",
+          "filename": "app/lib/actions.tsx"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "deleteCourse",
+      "filename": "app/lib/actions.tsx"
+    }
+  },
+  "edge": {}
+}
