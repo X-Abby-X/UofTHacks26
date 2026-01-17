@@ -1,0 +1,15 @@
+config.py
+/__pycache__/
+
+# Dependencies
+**/node_modules/
+**/venv/
+.env*
+
+# Build outputs
+**/.next/
+**/dist/
+**/build/
+
+# OS files
+.DS_Store
