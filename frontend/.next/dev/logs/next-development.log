@@ -1,8 +1,16 @@
-[00:00:01.709] Server  LOG     ✓ Ready in 1023ms
-[00:00:05.058] Server  LOG     ○ Compiling /genQuestions ...
-[00:00:10.391] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:58.324] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:04:38.195] Server  ERROR   ⨯ Error: The default export is not a React Component in "/genQuestions/page"
-[00:04:38.849] Server  ERROR   ⨯ Error: The default export is not a React Component in "/genQuestions/page"
-[00:04:39.548] Server  ERROR   ⨯ Error: The default export is not a React Component in "/genQuestions/page"
-[00:04:39.790] Server  ERROR   ⨯ Error: The default export is not a React Component in "/genQuestions/page"
+[00:00:02.134] Server  LOG     ✓ Ready in 1574ms
+[00:00:08.767] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:27.558] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:01:04.761] Server  LOG     ✓ Compiled in 465ms
+[00:01:28.626] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:01:30.535] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:01:32.366] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:01:33.047] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:02:46.752] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:55.005] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:02:56.961] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:02:57.945] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:02:59.614] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:04:12.875] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:04:16.151] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable
+[00:04:25.098] Browser WARN    'oklab(0.999994 0.0000455678 0.0000200868 / 0.1)' is not an animatable color. Use the equivalent color code instead.. For more information and steps for solving, visit https://motion.dev/troubleshooting/color-not-animatable

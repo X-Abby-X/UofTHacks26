@@ -79,23 +79,28 @@ class AcademicProcessor:
             return {
                 "analysis_report": [
                     {
-                        "question_number": 1,
-                        "detected_error": "Sign error in KCL equation at Node A.",
-                        "study_tip": "Review KCL conventions; remember that currents leaving the node are typically positive.",
-                        "unit_id": "Op-Amps"
+                        "question_number": 2,
+                        "detected_error": "Incorrect small-signal output voltage expression; output does not match the 1.032 gain factor calculated.",
+                        "study_tip": "Re-evaluate the superposition of DC and AC signals. While your small-signal resistance (621.23 Ω) was correct, ensure the final time-domain expression accurately reflects the amplified sine wave component.",
+                        "unit_id": "Diodes & Small-Signal Models"
                     },
                     {
-                        "question_number": 4,
-                        "detected_error": "Incorrect diode model used (ideal vs. constant voltage drop).",
-                        "study_tip": "Check the problem statement for specific diode parameters before starting your DC analysis.",
-                        "unit_id": "Diodes"
+                        "question_number": 3,
+                        "detected_error": "Inaccurate waveform sketching for vR2; failed to correctly identify clipping or conduction intervals for the 5V offset.",
+                        "study_tip": "Review diode conduction states when a DC bias (5V) is present. Practice sketching piecewise waveforms by determining the exact 'turn-on' time when vin(t) exceeds the bias voltage.",
+                        "unit_id": "Diode Waveform Analysis"
+                    },
+                    {
+                        "question_number": 6,
+                        "detected_error": "Calculation error in maximum load current; identified as 1.4A instead of 1.4mA based on the 15kΩ series resistor.",
+                        "study_tip": "Double-check unit scaling when working with kilo-ohms (kΩ). A 21V drop across 15kΩ results in milliamperes (mA), not amperes (A). Unit consistency is vital for Zener regulator power ratings.",
+                        "unit_id": "Zener Regulators"
                     }
                 ],
-                "updated_current_grade": 82, # Mocking a scenario where this is the only graded item
+                "updated_current_grade": 90.3,
                 "full_history": updated_milestones,
                 "archetype": "Visionary Architect",
-                "identity_insight": "You possess a deep grasp of Op-Amp theory, but your 'Visionary' nature leads to minor execution slips in KCL signs."
-
+                "identity_insight": "Your conceptual grasp of complex multi-diode circuits is elite, but your 'Visionary' nature leads to minor execution slips in unit scaling (A vs mA) and time-domain signal expressions."
             }
         """
         Analyzes a student exam/lab PDF, updates their score for that milestone,

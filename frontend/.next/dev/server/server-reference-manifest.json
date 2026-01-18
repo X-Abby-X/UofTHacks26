@@ -1,49 +1,5 @@
 {
   "node": {
-    "4049dc195d11c3ec7e0b2d07dec0c17012610457bf": {
-      "workers": {
-        "app/course/[id]/page": {
-          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "deleteCourse",
-          "filename": "app/lib/actions.tsx"
-        },
-        "app/page": {
-          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "deleteCourse",
-          "filename": "app/lib/actions.tsx"
-        }
-      },
-      "layer": {
-        "app/course/[id]/page": "rsc",
-        "app/page": "action-browser"
-      },
-      "filename": "app/lib/actions.tsx",
-      "exportedName": "deleteCourse"
-    },
-    "408d9bdea2033f571d595acc2cccd0e3de705e47b4": {
-      "workers": {
-        "app/course/[id]/page": {
-          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "createCourse",
-          "filename": "app/lib/actions.tsx"
-        },
-        "app/page": {
-          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "createCourse",
-          "filename": "app/lib/actions.tsx"
-        }
-      },
-      "layer": {
-        "app/course/[id]/page": "rsc",
-        "app/page": "action-browser"
-      },
-      "filename": "app/lib/actions.tsx",
-      "exportedName": "createCourse"
-    },
     "600ec9cef3bdac35cdc64ea5b4ba23e8097a0f75cc": {
       "workers": {
         "app/course/[id]/page": {
@@ -58,6 +14,21 @@
       },
       "filename": "app/course/[id]/page.tsx",
       "exportedName": "$$RSC_SERVER_ACTION_0"
+    },
+    "4049dc195d11c3ec7e0b2d07dec0c17012610457bf": {
+      "workers": {
+        "app/course/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteCourse",
+          "filename": "app/lib/actions.tsx"
+        }
+      },
+      "layer": {
+        "app/course/[id]/page": "rsc"
+      },
+      "filename": "app/lib/actions.tsx",
+      "exportedName": "deleteCourse"
     },
     "40678f240068f6f6c363a1aa35826d6066f1e84e30": {
       "workers": {
@@ -88,6 +59,21 @@
       },
       "filename": "app/lib/actions.tsx",
       "exportedName": "purgeCourseTelemetry"
+    },
+    "408d9bdea2033f571d595acc2cccd0e3de705e47b4": {
+      "workers": {
+        "app/course/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createCourse",
+          "filename": "app/lib/actions.tsx"
+        }
+      },
+      "layer": {
+        "app/course/[id]/page": "rsc"
+      },
+      "filename": "app/lib/actions.tsx",
+      "exportedName": "createCourse"
     },
     "606ee2ea97d933cd7dab137a27865382582e966ef6": {
       "workers": {
