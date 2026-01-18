@@ -4,7 +4,6 @@ from google import genai
 from config import DEV_MODE
 import json
 
-# Type alias for clarity
 FileOrUrl = Union[str, Any]
 
 class AcademicProcessor:
@@ -29,30 +28,21 @@ class AcademicProcessor:
                     { "name": "Final Exam", "weight": 50, "date": "Final Period" }
                 ]
             }
-        """
-        ACT AS: Academic Auditor.
-        TASK: Extract the full 'Marking Scheme' from the ECE231 syllabus.
-        """
+        
         prompt = """
         TASK: Identify every assessment category and its TOTAL weight (%) from the syllabus.
-        
         STRICT RULES:
         1. Capture: Midterm, Quizzes, Labs, Homework, and Final Exam.
         2. Combine multi-part items: '5 Labs, 2% each' must be returned as a single item 'Labs' with weight 10.
-        3. Do not include 'Bonus' marks in the 100% total unless explicitly listed.
         
         OUTPUT FORMAT (JSON):
         {
           "milestones": [
             { "name": "Midterm", "weight": 25, "date": "2025-10-23" },
-            { "name": "Quizzes", "weight": 10, "date": "Multiple" },
-            { "name": "Labs", "weight": 10, "date": "Weekly" },
-            { "name": "Homework", "weight": 5, "date": "Weekly" },
-            { "name": "Final Exam", "weight": 50, "date": "Final Period" }
+            { "name": "Quizzes", "weight": 10, "date": "Multiple" }
           ]
         }
         """
-        # Gemini 2.0 can process public URLs directly as a content part
         response = self.client.models.generate_content(
             model=self.model_name,
             contents=[syllabus_url, prompt],
@@ -60,24 +50,47 @@ class AcademicProcessor:
         )
         return json.loads(response.text)
 
+    # backend/processor.py
     def analyze_and_deduce_grade(
         self, 
         submission_url: str, 
-        existing_milestones: List[Dict[str, Any]]
+        existing_milestones: List[Dict[str, Any]],
+        course_id: str # This now receives course.name from actions.ts
     ) -> Dict[str, Any]:
+        
         if DEV_MODE:
-            print(">>> [DEV MODE] Returning Dummy Midterm Analysis")
+            cid = course_id.lower()
+            print(f">>> [DEV MODE] Logic switch based on name: {cid}")
             
-            # Logic: Find the 'Midterm' milestone to update its score
-            updated_milestones = []
-            for m in existing_milestones:
-                new_m = m.copy()
-                if m['name'] == 'Midterm':
-                    new_m['score'] = 82  # Simulate a scored midterm
-                updated_milestones.append(new_m)
-
-            return {
-                "analysis_report": [
+            if "mat291" in cid:
+                target_score = 87.5
+                target_milestone = "Quizzes"
+                analysis_report = [
+                    {
+                        "question_number": 1,
+                        "detected_error": "Calculation error in Divergence Theorem computation; final numerical solution mismatch.",
+                        "study_tip": "Review the final computation steps for Volume integrals. While you correctly identified that the divergence of F is 3 and successfully argued the relationship between the volume and the boundary integral, ensure the final evaluation remains consistent with the divergence constant.",
+                        "unit_id": "Vector Calculus: Divergence Theorem" 
+                    },
+                    {
+                        "question_number": 2,
+                        "detected_error": "Incorrect evaluation of circulation along closed contours C and L; improper surface selection for Stokes' Theorem.",
+                        "study_tip": "Focus on identifying valid surfaces S that do not pass through singularities. You correctly noted that the curl is not defined on the z-axis, but points were lost on the final evaluation of circulation along C and L. Practice direct parametrization for non-simply connected domains.",
+                        "unit_id": "Vector Calculus: Stokes' Theorem & Circulation"
+                    },
+                    {
+                        "question_number": 3,
+                        "detected_error": "None identified. Full marks awarded for correct cylindrical transformation and observation point analysis.", 
+                        "study_tip": "Excellent execution on the transformation matrix application and the translation to the localized reference point. Continue using this structured step-by-step approach—translating to Cartesian before Cylindrical—to ensure precision in multi-step field problems.", 
+                        "unit_id": "Coordinate Transformations: Spherical & Cylindrical" 
+                    }
+                ]
+                insight = "You demonstrate elite proficiency in coordinate transformations and spatial reasoning. Your 'Visionary' nature allowed you to navigate the complex shift from spherical to cylindrical flawlessly, though smaller computational details in standard vector theorems currently prevent full system resonance."
+            
+            else: # Default to ECE231
+                target_score = 90.3 
+                target_milestone = "Midterm"
+                analysis_report = [
                     {
                         "question_number": 2,
                         "detected_error": "Incorrect small-signal output voltage expression; output does not match the 1.032 gain factor calculated.",
@@ -97,44 +110,21 @@ class AcademicProcessor:
                         "unit_id": "Zener Regulators"
                     }
                 ],
-                "updated_current_grade": 90.3,
+                
+                insight = "Your conceptual grasp of complex multi-diode circuits is elite, but your 'Visionary' nature leads to minor execution slips in unit scaling (A vs mA) and time-domain signal expressions."
+
+            # Update only the target milestone
+            updated_milestones = []
+            for m in existing_milestones:
+                new_m = m.copy()
+                if m['name'].lower() == target_milestone.lower():
+                    new_m['score'] = target_score
+                updated_milestones.append(new_m)
+
+            return {
+                "analysis_report": analysis_report,
+                "updated_current_grade": target_score,
                 "full_history": updated_milestones,
                 "archetype": "Visionary Architect",
-                "identity_insight": "Your conceptual grasp of complex multi-diode circuits is elite, but your 'Visionary' nature leads to minor execution slips in unit scaling (A vs mA) and time-domain signal expressions."
+                "identity_insight": insight
             }
-        """
-        Analyzes a student exam/lab PDF, updates their score for that milestone,
-        and calculates the new overall course average.
-        """
-        milestones_json = json.dumps(existing_milestones)
-
-        prompt = f"""
-        ACT AS: Academic Auditor & Grade Prophet.
-        CONTEXT: The course has the following initialized milestones: {milestones_json}
-
-        TASK:
-        1. Grade the attached student submission (PDF) out of 100.
-        2. Identify which milestone this belongs to (e.g., if it's a Midterm, find the "Midterm" milestone).
-        3. CALCULATE the new overall course grade using the weighted average formula.
-        
-        WEIGHTED FORMULA: 
-        Current Grade = (Sum of all [Score * Weight]) / (Sum of all Weights currently completed)
-
-        OUTPUT FORMAT (JSON):
-        {{
-          "analysis_report": [
-            {{ "question_number": 1, "detected_error": "...", "study_tip": "...", "unit_id": "..." }}
-          ],
-          "updated_current_grade": 82,
-          "full_history": [
-             {{ "name": "Midterm", "weight": 25, "score": 85, "date": "2025-10-23" }},
-             ... (all other milestones preserved)
-          ]
-        }}
-        """
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=[submission_url, prompt],
-            config={'response_mime_type': 'application/json'}
-        )
-        return json.loads(response.text)

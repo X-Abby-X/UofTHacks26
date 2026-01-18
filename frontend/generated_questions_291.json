@@ -1,0 +1,46 @@
+{
+    "questions": [
+        {
+            "question_id": 1,
+            "unit": "Vector Calculus: Divergence Theorem",
+            "question_text": "Consider the vector field F = <x^2, y^2, z^2> defined over the domain X, which is a solid cube defined by 0 ≤ x ≤ 2, 0 ≤ y ≤ 2, and 0 ≤ z ≤ 2. \na) Compute the divergence of F. \nb) Use the Divergence Theorem to evaluate the outward flux of F across the boundary of X. Ensure your final numerical computation is simplified.",
+            "requires_image": false,
+            "rendered_image_path": ""
+        },
+        {
+            "question_id": 2,
+            "unit": "Vector Calculus: Stokes' Theorem & Circulation",
+            "question_text": "A vector field is given by F = < -y / (x^2 + y^2), x / (x^2 + y^2), z >. Let L be a closed contour in the plane z = 5 described by the polar equation r = 3 + cos(θ). \na) Explain why Stokes' Theorem cannot be applied to a surface S that is the flat disk enclosed by L in the z = 5 plane. \nb) Directly evaluate the circulation of F along the contour L in the counter-clockwise direction.",
+            "requires_image": false,
+            "rendered_image_path": ""
+        },
+        {
+            "question_id": 3,
+            "unit": "Coordinate Transformations",
+            "question_text": "A spherical coordinate field is defined as F_s = <r^2, 0, 0> relative to a source centered at r0 = <0, 0, 5>. \na) Translate the observation point P = <0, 0, 2> into localized coordinates relative to the shifted center r0. \nb) Compute the Cartesian components (Fx, Fy, Fz) of the field at the observation point P using the transformation matrix.",
+            "requires_image": false,
+            "rendered_image_path": ""
+        },
+        {
+            "question_id": 4,
+            "unit": "Vector Calculus: Divergence Theorem",
+            "question_text": "Evaluate the surface integral (flux) of F = <x, y, z> over the closed surface of a cylinder defined by x^2 + y^2 ≤ 4 and 0 ≤ z ≤ 3. Verify your result by calculating the volume integral of the divergence.",
+            "requires_image": false,
+            "rendered_image_path": ""
+        },
+        {
+            "question_id": 5,
+            "unit": "Vector Calculus: Stokes' Theorem",
+            "question_text": "Let F = <y, -x, 0>. Compute the circulation of F around the unit circle x^2 + y^2 = 1 in the z = 0 plane. Then, find a surface S whose boundary is this circle and use Stokes' Theorem to verify the circulation value.",
+            "requires_image": false,
+            "rendered_image_path": ""
+        },
+        {
+            "question_id": 6,
+            "unit": "Coordinate Transformations",
+            "question_text": "Convert the Cartesian vector F = <1, 1, 0> at the point (1, 1, 0) into Cylindrical coordinates (Fr, Fθ, Fz). Clearly show the calculation of the angle θ and the application of the transformation matrix.",
+            "requires_image": false,
+            "rendered_image_path": ""
+        }
+    ]
+}

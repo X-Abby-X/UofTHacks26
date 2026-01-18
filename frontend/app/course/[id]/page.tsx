@@ -360,7 +360,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
 
                         {/* 3. REFINED SYNTHETIC EXAM BUTTON */}
                         {hasSubmission && (
-                            <Link href="/genQuestions">
+                            <Link href={`/genQuestions?courseId=${course.id}`}>
                                 <motion.div 
                                     whileHover={{ scale: 1.01, borderColor: 'rgba(139, 92, 246, 0.5)' }}
                                     whileTap={{ scale: 0.99 }}

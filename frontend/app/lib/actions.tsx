@@ -41,8 +41,8 @@ export async function processSyllabusAction(courseId: string, publicUrl: string)
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                courseId: courseId,   //
-                syllabusUrl: publicUrl //
+                courseId: courseId,   
+                syllabusUrl: publicUrl 
             }),
         });
 
@@ -52,17 +52,15 @@ export async function processSyllabusAction(courseId: string, publicUrl: string)
         // FIX: Only update milestones, explicitly reset grade to 0
         await db.update(courses)
             .set({
-                milestones: aiResult.milestones, //
-                currentGrade: 0, // Prevents accidental 82% during syllabus phase
+                milestones: aiResult.milestones, 
+                currentGrade: 0, 
             })
             .where(eq(courses.id, courseId));
 
-        // FOR VAULT
-        // 2. NEW: Log the Syllabus in the submissions table so it shows in the Vault
+        // FOR VAULT: Log the Syllabus in the submissions table
         await db.insert(submissions).values({
             courseId: courseId,
             name: "Official Course Syllabus",
-            // We store the URL in a JSON field if you want easy access later
             analysisReport: [{ type: "syllabus", url: publicUrl }]
         });
 
@@ -82,48 +80,49 @@ export async function createSubmissionAction(courseId: string, pdfUrl: string) {
     try {
         const backendBase = process.env.BACKEND_URL || "http://127.0.0.1:8000";
 
-        // 1. Fetch current context for the weighted grade calculation
+        // 1. Fetch current context using the UUID
         const course = await db.query.courses.findFirst({
             where: eq(courses.id, courseId)
         });
+
+        if (!course) throw new Error("Course not found");
 
         // 2. Trigger Midterm Analysis
         const response = await fetch(`${backendBase}/analyze-submission`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                submissionUrl: pdfUrl, //
-                existingMilestones: course?.milestones || [] //
+                // We send the NAME (e.g. "MAT291") so Python can use 'if/else' 
+                // but we keep the UUID (courseId) available if needed
+                courseId: course.name, 
+                submissionUrl: pdfUrl,
+                existingMilestones: course.milestones || []
             }),
         });
 
         if (!response.ok) throw new Error("Neural Analysis fetch failed");
         const auditResults = await response.json();
 
-        // 3. Update the Course (This sets the 82% Grade)
-        // Maps Python 'updated_current_grade' to DB 'currentGrade'
+        // 3. Update the Course using the original UUID
         await db.update(courses)
             .set({
-                currentGrade: Math.round(auditResults.updated_current_grade || 0), // Schema is integer
-                milestones: auditResults.full_history, //
+                currentGrade: Math.round(auditResults.updated_current_grade || 0),
+                milestones: auditResults.full_history,
             })
-            .where(eq(courses.id, courseId));
+            .where(eq(courses.id, courseId)); // Using UUID here
 
-        // 4. Create the Submission Record (Stores KCL/Diode tips)
-        // Maps Python 'analysis_report' to DB 'analysisReport'
-        const [newRecord] = await db.insert(submissions).values({
-            courseId: courseId,
-            name: `Audit: ${new Date().toLocaleDateString()}`,
+        // 4. Create the Submission Record using the original UUID
+        await db.insert(submissions).values({
+            courseId: courseId, // Using UUID here
+            name: `Audit: ${course.name} - ${new Date().toLocaleDateString()}`,
             analysisReport: auditResults.analysis_report,
-        }).returning({ id: submissions.id });
+        });
 
         revalidatePath(`/course/${courseId}`);
-        revalidatePath('/');
-
-        return { id: newRecord.id, success: true };
+        return { success: true };
     } catch (error) {
         console.error("Submission Action Failure:", error);
-        return { success: false, error: "Database or API sync error" };
+        return { success: false, error: "Sync error" };
     }
 }
 
