@@ -318,7 +318,7 @@ __turbopack_context__.n(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$u
 "[project]/app/lib/actions.tsx [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"4015c02ddc581c627060699c04369c69e5d1adde14":"purgeCourseTelemetry","4090343f00ed10f4472b943068f07dc92ce7b193bd":"createCourse","40c5d260e06a26e8e357801a39d7cf9fb6cba0e0f7":"deleteSyllabusAction","40ccc0a3956a500315848a9343d415371d73d4dcf2":"deleteCourse","60255775f009031bf91ef603cc452a8bff463de37c":"deleteSubmissionAction","60262169a5b5349a23c0ba9e0de1f8c2583ccbe701":"createSubmissionAction","60bd0a6a6fbf566136bd8e01509778d29d43df19af":"processSyllabusAction"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"4049dc195d11c3ec7e0b2d07dec0c17012610457bf":"deleteCourse","40678f240068f6f6c363a1aa35826d6066f1e84e30":"deleteSyllabusAction","406991cb34bb3100160a679d0fd69c0886f1f20692":"purgeCourseTelemetry","408d9bdea2033f571d595acc2cccd0e3de705e47b4":"createCourse","606ee2ea97d933cd7dab137a27865382582e966ef6":"createSubmissionAction","609e743dda48a3db35be26af84eb99661eb8c90619":"deleteSubmissionAction","60a1314cb003c5d47c5dc2ca9538f3b5391d7b3678":"processSyllabusAction"},"",""] */ __turbopack_context__.s([
     "createCourse",
     ()=>createCourse,
     "createSubmissionAction",
@@ -500,13 +500,13 @@ async function purgeCourseTelemetry(courseId) {
     deleteSubmissionAction,
     purgeCourseTelemetry
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createCourse, "4090343f00ed10f4472b943068f07dc92ce7b193bd", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteCourse, "40ccc0a3956a500315848a9343d415371d73d4dcf2", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(processSyllabusAction, "60bd0a6a6fbf566136bd8e01509778d29d43df19af", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createSubmissionAction, "60262169a5b5349a23c0ba9e0de1f8c2583ccbe701", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteSyllabusAction, "40c5d260e06a26e8e357801a39d7cf9fb6cba0e0f7", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteSubmissionAction, "60255775f009031bf91ef603cc452a8bff463de37c", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(purgeCourseTelemetry, "4015c02ddc581c627060699c04369c69e5d1adde14", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createCourse, "408d9bdea2033f571d595acc2cccd0e3de705e47b4", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteCourse, "4049dc195d11c3ec7e0b2d07dec0c17012610457bf", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(processSyllabusAction, "60a1314cb003c5d47c5dc2ca9538f3b5391d7b3678", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createSubmissionAction, "606ee2ea97d933cd7dab137a27865382582e966ef6", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteSyllabusAction, "40678f240068f6f6c363a1aa35826d6066f1e84e30", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteSubmissionAction, "609e743dda48a3db35be26af84eb99661eb8c90619", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(purgeCourseTelemetry, "406991cb34bb3100160a679d0fd69c0886f1f20692", null);
 }),
 "[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
@@ -520,7 +520,7 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/app-render/encryption.js [app-rsc] (ecmascript)");
-/* __next_internal_action_entry_do_not_use__ [{"602eed04bba2f119c8c5886c061f76fa261b5e2342":"$$RSC_SERVER_ACTION_0"},"",""] */ var __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/drizzle/index.ts [app-rsc] (ecmascript)");
+/* __next_internal_action_entry_do_not_use__ [{"600ec9cef3bdac35cdc64ea5b4ba23e8097a0f75cc":"$$RSC_SERVER_ACTION_0"},"",""] */ var __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/drizzle/index.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/drizzle/db/schema.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$sql$2f$expressions$2f$conditions$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/drizzle-orm/sql/expressions/conditions.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$sql$2f$expressions$2f$select$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/drizzle-orm/sql/expressions/select.js [app-rsc] (ecmascript)");
@@ -548,10 +548,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx
 ;
 ;
 const $$RSC_SERVER_ACTION_0 = async function onSuccess($$ACTION_CLOSURE_BOUND, path) {
-    var [$$ACTION_ARG_0] = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["decryptActionBoundArgs"])("602eed04bba2f119c8c5886c061f76fa261b5e2342", $$ACTION_CLOSURE_BOUND);
+    var [$$ACTION_ARG_0] = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["decryptActionBoundArgs"])("600ec9cef3bdac35cdc64ea5b4ba23e8097a0f75cc", $$ACTION_CLOSURE_BOUND);
     await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["processSyllabusAction"])($$ACTION_ARG_0, path);
 };
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])($$RSC_SERVER_ACTION_0, "602eed04bba2f119c8c5886c061f76fa261b5e2342", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])($$RSC_SERVER_ACTION_0, "600ec9cef3bdac35cdc64ea5b4ba23e8097a0f75cc", null);
 async function CourseDetailPage({ params }) {
     const { id } = await params;
     // 1. Fetch Course and latest Submissions
@@ -650,7 +650,7 @@ async function CourseDetailPage({ params }) {
                                 userID: "system-user",
                                 courseID: id,
                                 folder: "syllabus_files",
-                                onSuccess: $$RSC_SERVER_ACTION_0.bind(null, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["encryptActionBoundArgs"])("602eed04bba2f119c8c5886c061f76fa261b5e2342", id))
+                                onSuccess: $$RSC_SERVER_ACTION_0.bind(null, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["encryptActionBoundArgs"])("600ec9cef3bdac35cdc64ea5b4ba23e8097a0f75cc", id))
                             }, void 0, false, {
                                 fileName: "[project]/app/course/[id]/page.tsx",
                                 lineNumber: 55,
@@ -755,21 +755,21 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx
 "use strict";
 
 __turbopack_context__.s([
-    "4015c02ddc581c627060699c04369c69e5d1adde14",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["purgeCourseTelemetry"],
-    "4090343f00ed10f4472b943068f07dc92ce7b193bd",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createCourse"],
-    "40c5d260e06a26e8e357801a39d7cf9fb6cba0e0f7",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteSyllabusAction"],
-    "40ccc0a3956a500315848a9343d415371d73d4dcf2",
+    "4049dc195d11c3ec7e0b2d07dec0c17012610457bf",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteCourse"],
-    "60255775f009031bf91ef603cc452a8bff463de37c",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteSubmissionAction"],
-    "60262169a5b5349a23c0ba9e0de1f8c2583ccbe701",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createSubmissionAction"],
-    "602eed04bba2f119c8c5886c061f76fa261b5e2342",
+    "40678f240068f6f6c363a1aa35826d6066f1e84e30",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteSyllabusAction"],
+    "406991cb34bb3100160a679d0fd69c0886f1f20692",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["purgeCourseTelemetry"],
+    "408d9bdea2033f571d595acc2cccd0e3de705e47b4",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createCourse"],
+    "600ec9cef3bdac35cdc64ea5b4ba23e8097a0f75cc",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$course$2f5b$id$5d2f$page$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["$$RSC_SERVER_ACTION_0"],
-    "60bd0a6a6fbf566136bd8e01509778d29d43df19af",
+    "606ee2ea97d933cd7dab137a27865382582e966ef6",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createSubmissionAction"],
+    "609e743dda48a3db35be26af84eb99661eb8c90619",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteSubmissionAction"],
+    "60a1314cb003c5d47c5dc2ca9538f3b5391d7b3678",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["processSyllabusAction"]
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$course$2f5b$id$5d2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$app$2f$course$2f5b$id$5d2f$page$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => "[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)", ACTIONS_MODULE1 => "[project]/app/lib/actions.tsx [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <locals>');

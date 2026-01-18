@@ -1,6 +1,6 @@
 {
   "node": {
-    "40ccc0a3956a500315848a9343d415371d73d4dcf2": {
+    "4049dc195d11c3ec7e0b2d07dec0c17012610457bf": {
       "workers": {
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -15,7 +15,7 @@
       "exportedName": "deleteCourse",
       "filename": "app/lib/actions.tsx"
     },
-    "4090343f00ed10f4472b943068f07dc92ce7b193bd": {
+    "408d9bdea2033f571d595acc2cccd0e3de705e47b4": {
       "workers": {
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",

@@ -1,6 +1,6 @@
 {
   "node": {
-    "602eed04bba2f119c8c5886c061f76fa261b5e2342": {
+    "600ec9cef3bdac35cdc64ea5b4ba23e8097a0f75cc": {
       "workers": {
         "app/course/[id]/page": {
           "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -15,52 +15,7 @@
       "exportedName": "$$RSC_SERVER_ACTION_0",
       "filename": "app/course/[id]/page.tsx"
     },
-    "4015c02ddc581c627060699c04369c69e5d1adde14": {
-      "workers": {
-        "app/course/[id]/page": {
-          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "purgeCourseTelemetry",
-          "filename": "app/lib/actions.tsx"
-        }
-      },
-      "layer": {
-        "app/course/[id]/page": "rsc"
-      },
-      "exportedName": "purgeCourseTelemetry",
-      "filename": "app/lib/actions.tsx"
-    },
-    "4090343f00ed10f4472b943068f07dc92ce7b193bd": {
-      "workers": {
-        "app/course/[id]/page": {
-          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "createCourse",
-          "filename": "app/lib/actions.tsx"
-        }
-      },
-      "layer": {
-        "app/course/[id]/page": "rsc"
-      },
-      "exportedName": "createCourse",
-      "filename": "app/lib/actions.tsx"
-    },
-    "40c5d260e06a26e8e357801a39d7cf9fb6cba0e0f7": {
-      "workers": {
-        "app/course/[id]/page": {
-          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "deleteSyllabusAction",
-          "filename": "app/lib/actions.tsx"
-        }
-      },
-      "layer": {
-        "app/course/[id]/page": "action-browser"
-      },
-      "exportedName": "deleteSyllabusAction",
-      "filename": "app/lib/actions.tsx"
-    },
-    "40ccc0a3956a500315848a9343d415371d73d4dcf2": {
+    "4049dc195d11c3ec7e0b2d07dec0c17012610457bf": {
       "workers": {
         "app/course/[id]/page": {
           "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -75,22 +30,52 @@
       "exportedName": "deleteCourse",
       "filename": "app/lib/actions.tsx"
     },
-    "60255775f009031bf91ef603cc452a8bff463de37c": {
+    "40678f240068f6f6c363a1aa35826d6066f1e84e30": {
       "workers": {
         "app/course/[id]/page": {
           "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false,
-          "exportedName": "deleteSubmissionAction",
+          "exportedName": "deleteSyllabusAction",
+          "filename": "app/lib/actions.tsx"
+        }
+      },
+      "layer": {
+        "app/course/[id]/page": "action-browser"
+      },
+      "exportedName": "deleteSyllabusAction",
+      "filename": "app/lib/actions.tsx"
+    },
+    "406991cb34bb3100160a679d0fd69c0886f1f20692": {
+      "workers": {
+        "app/course/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "purgeCourseTelemetry",
           "filename": "app/lib/actions.tsx"
         }
       },
       "layer": {
         "app/course/[id]/page": "rsc"
       },
-      "exportedName": "deleteSubmissionAction",
+      "exportedName": "purgeCourseTelemetry",
       "filename": "app/lib/actions.tsx"
     },
-    "60262169a5b5349a23c0ba9e0de1f8c2583ccbe701": {
+    "408d9bdea2033f571d595acc2cccd0e3de705e47b4": {
+      "workers": {
+        "app/course/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createCourse",
+          "filename": "app/lib/actions.tsx"
+        }
+      },
+      "layer": {
+        "app/course/[id]/page": "rsc"
+      },
+      "exportedName": "createCourse",
+      "filename": "app/lib/actions.tsx"
+    },
+    "606ee2ea97d933cd7dab137a27865382582e966ef6": {
       "workers": {
         "app/course/[id]/page": {
           "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -105,7 +90,22 @@
       "exportedName": "createSubmissionAction",
       "filename": "app/lib/actions.tsx"
     },
-    "60bd0a6a6fbf566136bd8e01509778d29d43df19af": {
+    "609e743dda48a3db35be26af84eb99661eb8c90619": {
+      "workers": {
+        "app/course/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteSubmissionAction",
+          "filename": "app/lib/actions.tsx"
+        }
+      },
+      "layer": {
+        "app/course/[id]/page": "rsc"
+      },
+      "exportedName": "deleteSubmissionAction",
+      "filename": "app/lib/actions.tsx"
+    },
+    "60a1314cb003c5d47c5dc2ca9538f3b5391d7b3678": {
       "workers": {
         "app/course/[id]/page": {
           "moduleId": "[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/lib/actions.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
