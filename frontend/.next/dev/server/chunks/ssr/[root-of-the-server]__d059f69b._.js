@@ -318,7 +318,7 @@ __turbopack_context__.n(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$u
 "[project]/app/lib/actions.tsx [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"4015c02ddc581c627060699c04369c69e5d1adde14":"purgeCourseTelemetry","4090343f00ed10f4472b943068f07dc92ce7b193bd":"createCourse","40c5d260e06a26e8e357801a39d7cf9fb6cba0e0f7":"deleteSyllabusAction","40ccc0a3956a500315848a9343d415371d73d4dcf2":"deleteCourse","60255775f009031bf91ef603cc452a8bff463de37c":"deleteSubmissionAction","60262169a5b5349a23c0ba9e0de1f8c2583ccbe701":"createSubmissionAction","60bd0a6a6fbf566136bd8e01509778d29d43df19af":"processSyllabusAction"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"405e3a5b7d9e840246a0ac847848e105325e85ccc8":"deleteCourse","40844cba3db84adc646afc473b4eda7b4dab4ca9cd":"purgeCourseTelemetry","409ec0327324ece2a48dae842673576075402ae1bb":"deleteSyllabusAction","40be85b1cd710716c1bd4c373f77aa6a6d97cc00ea":"createCourse","600915dea7e13b908f09d7a06b186ad569db2479ef":"createSubmissionAction","607c573bdd977e50b62cd4f4d0afb493f4448b4286":"deleteSubmissionAction","60b78b8f240bccdad0763325ccbe14fe392fb73fda":"processSyllabusAction"},"",""] */ __turbopack_context__.s([
     "createCourse",
     ()=>createCourse,
     "createSubmissionAction",
@@ -378,7 +378,7 @@ async function processSyllabusAction(courseId, publicUrl) {
             },
             body: JSON.stringify({
                 courseId: courseId,
-                syllabusUrl: publicUrl //
+                syllabusUrl: publicUrl
             })
         });
         if (!response.ok) throw new Error("Syllabus Audit Failed");
@@ -388,12 +388,10 @@ async function processSyllabusAction(courseId, publicUrl) {
             milestones: aiResult.milestones,
             currentGrade: 0
         }).where((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$sql$2f$expressions$2f$conditions$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["eq"])(__TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["courses"].id, courseId));
-        // FOR VAULT
-        // 2. NEW: Log the Syllabus in the submissions table so it shows in the Vault
+        // FOR VAULT: Log the Syllabus in the submissions table
         await __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].insert(__TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["submissions"]).values({
             courseId: courseId,
             name: "Official Course Syllabus",
-            // We store the URL in a JSON field if you want easy access later
             analysisReport: [
                 {
                     type: "syllabus",
@@ -406,7 +404,7 @@ async function processSyllabusAction(courseId, publicUrl) {
             success: true
         };
     } catch (error) {
-        console.error("Syllabus Error:", error);
+        /* eslint-disable */ console.error(...oo_tx(`1659671181_70_8_70_47_11`, "Syllabus Error:", error));
         return {
             success: false,
             error: "Sync Failed"
@@ -416,10 +414,11 @@ async function processSyllabusAction(courseId, publicUrl) {
 async function createSubmissionAction(courseId, pdfUrl) {
     try {
         const backendBase = process.env.BACKEND_URL || "http://127.0.0.1:8000";
-        // 1. Fetch current context for the weighted grade calculation
+        // 1. Fetch current context using the UUID
         const course = await __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].query.courses.findFirst({
             where: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$sql$2f$expressions$2f$conditions$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["eq"])(__TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["courses"].id, courseId)
         });
+        if (!course) throw new Error("Course not found");
         // 2. Trigger Midterm Analysis
         const response = await fetch(`${backendBase}/analyze-submission`, {
             method: 'POST',
@@ -427,38 +426,35 @@ async function createSubmissionAction(courseId, pdfUrl) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                // We send the NAME (e.g. "MAT291") so Python can use 'if/else' 
+                // but we keep the UUID (courseId) available if needed
+                courseId: course.name,
                 submissionUrl: pdfUrl,
-                existingMilestones: course?.milestones || [] //
+                existingMilestones: course.milestones || []
             })
         });
         if (!response.ok) throw new Error("Neural Analysis fetch failed");
         const auditResults = await response.json();
-        // 3. Update the Course (This sets the 82% Grade)
-        // Maps Python 'updated_current_grade' to DB 'currentGrade'
+        // 3. Update the Course using the original UUID
         await __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].update(__TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["courses"]).set({
             currentGrade: Math.round(auditResults.updated_current_grade || 0),
             milestones: auditResults.full_history
-        }).where((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$sql$2f$expressions$2f$conditions$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["eq"])(__TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["courses"].id, courseId));
-        // 4. Create the Submission Record (Stores KCL/Diode tips)
-        // Maps Python 'analysis_report' to DB 'analysisReport'
-        const [newRecord] = await __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].insert(__TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["submissions"]).values({
+        }).where((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$sql$2f$expressions$2f$conditions$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["eq"])(__TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["courses"].id, courseId)); // Using UUID here
+        // 4. Create the Submission Record using the original UUID
+        await __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].insert(__TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["submissions"]).values({
             courseId: courseId,
-            name: `Audit: ${new Date().toLocaleDateString()}`,
+            name: `Audit: ${course.name} - ${new Date().toLocaleDateString()}`,
             analysisReport: auditResults.analysis_report
-        }).returning({
-            id: __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["submissions"].id
         });
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])(`/course/${courseId}`);
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/');
         return {
-            id: newRecord.id,
             success: true
         };
     } catch (error) {
-        console.error("Submission Action Failure:", error);
+        /* eslint-disable */ console.error(...oo_tx(`1659671181_124_8_124_58_11`, "Submission Action Failure:", error));
         return {
             success: false,
-            error: "Database or API sync error"
+            error: "Sync error"
         };
     }
 }
@@ -490,6 +486,48 @@ async function purgeCourseTelemetry(courseId) {
     }).where((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$sql$2f$expressions$2f$conditions$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["eq"])(__TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["courses"].id, courseId));
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])(`/course/${courseId}`);
 }
+function oo_cm() {
+    try {
+        return (0, eval)("globalThis._console_ninja") || (0, eval)("/* https://github.com/wallabyjs/console-ninja#how-does-it-work */'use strict';var _0x3ea9a1=_0x35df;(function(_0x4d4776,_0x1fd229){var _0x357254=_0x35df,_0x36834a=_0x4d4776();while(!![]){try{var _0x86fd72=-parseInt(_0x357254(0x175))/0x1+-parseInt(_0x357254(0x216))/0x2*(parseInt(_0x357254(0x18d))/0x3)+parseInt(_0x357254(0x20f))/0x4*(parseInt(_0x357254(0x195))/0x5)+parseInt(_0x357254(0x1f4))/0x6+parseInt(_0x357254(0x259))/0x7*(parseInt(_0x357254(0x199))/0x8)+parseInt(_0x357254(0x197))/0x9*(-parseInt(_0x357254(0x231))/0xa)+-parseInt(_0x357254(0x261))/0xb*(-parseInt(_0x357254(0x190))/0xc);if(_0x86fd72===_0x1fd229)break;else _0x36834a['push'](_0x36834a['shift']());}catch(_0x4784a0){_0x36834a['push'](_0x36834a['shift']());}}}(_0x3657,0xaf78d));function z(_0x2316dd,_0x40ae57,_0x256f9c,_0x262bbb,_0x257fe0,_0x281e7b){var _0x850650=_0x35df,_0x5c81df,_0x2c3968,_0x19e51f,_0x21401d;this[_0x850650(0x183)]=_0x2316dd,this['host']=_0x40ae57,this[_0x850650(0x22a)]=_0x256f9c,this['nodeModules']=_0x262bbb,this['dockerizedApp']=_0x257fe0,this[_0x850650(0x235)]=_0x281e7b,this[_0x850650(0x203)]=!0x0,this['_allowedToConnectOnSend']=!0x0,this[_0x850650(0x1c2)]=!0x1,this[_0x850650(0x211)]=!0x1,this['_inNextEdge']=((_0x2c3968=(_0x5c81df=_0x2316dd[_0x850650(0x17a)])==null?void 0x0:_0x5c81df[_0x850650(0x1ef)])==null?void 0x0:_0x2c3968[_0x850650(0x229)])===_0x850650(0x19e),this[_0x850650(0x228)]=!((_0x21401d=(_0x19e51f=this[_0x850650(0x183)][_0x850650(0x17a)])==null?void 0x0:_0x19e51f['versions'])!=null&&_0x21401d[_0x850650(0x1a6)])&&!this[_0x850650(0x184)],this[_0x850650(0x1dd)]=null,this[_0x850650(0x191)]=0x0,this[_0x850650(0x266)]=0x14,this[_0x850650(0x25b)]=_0x850650(0x172),this[_0x850650(0x226)]=(this[_0x850650(0x228)]?_0x850650(0x178):_0x850650(0x193))+this[_0x850650(0x25b)];}z[_0x3ea9a1(0x233)][_0x3ea9a1(0x264)]=async function(){var _0x2fa191=_0x3ea9a1,_0x377536,_0x246e53;if(this['_WebSocketClass'])return this['_WebSocketClass'];let _0x5bb1f6;if(this[_0x2fa191(0x228)]||this[_0x2fa191(0x184)])_0x5bb1f6=this[_0x2fa191(0x183)][_0x2fa191(0x24f)];else{if((_0x377536=this['global']['process'])!=null&&_0x377536[_0x2fa191(0x16d)])_0x5bb1f6=(_0x246e53=this[_0x2fa191(0x183)]['process'])==null?void 0x0:_0x246e53[_0x2fa191(0x16d)];else try{_0x5bb1f6=(await new Function(_0x2fa191(0x1ea),_0x2fa191(0x23d),_0x2fa191(0x1d2),_0x2fa191(0x186))(await(0x0,eval)(_0x2fa191(0x17d)),await(0x0,eval)(_0x2fa191(0x21a)),this[_0x2fa191(0x1d2)]))[_0x2fa191(0x1c9)];}catch{try{_0x5bb1f6=require(require(_0x2fa191(0x1ea))['join'](this[_0x2fa191(0x1d2)],'ws'));}catch{throw new Error(_0x2fa191(0x1ad));}}}return this[_0x2fa191(0x1dd)]=_0x5bb1f6,_0x5bb1f6;},z[_0x3ea9a1(0x233)][_0x3ea9a1(0x208)]=function(){var _0x2dd73c=_0x3ea9a1;this[_0x2dd73c(0x211)]||this[_0x2dd73c(0x1c2)]||this[_0x2dd73c(0x191)]>=this[_0x2dd73c(0x266)]||(this[_0x2dd73c(0x20b)]=!0x1,this[_0x2dd73c(0x211)]=!0x0,this['_connectAttemptCount']++,this[_0x2dd73c(0x255)]=new Promise((_0x4ac8e4,_0x63d394)=>{var _0x3a836a=_0x2dd73c;this[_0x3a836a(0x264)]()['then'](_0x39ebc5=>{var _0x26d05b=_0x3a836a;let _0x4b2b29=new _0x39ebc5(_0x26d05b(0x1eb)+(!this['_inBrowser']&&this['dockerizedApp']?_0x26d05b(0x205):this[_0x26d05b(0x1fe)])+':'+this[_0x26d05b(0x22a)]);_0x4b2b29[_0x26d05b(0x1f1)]=()=>{var _0x3ea250=_0x26d05b;this[_0x3ea250(0x203)]=!0x1,this['_disposeWebsocket'](_0x4b2b29),this[_0x3ea250(0x219)](),_0x63d394(new Error(_0x3ea250(0x1f3)));},_0x4b2b29['onopen']=()=>{var _0x3a4525=_0x26d05b;this['_inBrowser']||_0x4b2b29[_0x3a4525(0x1d0)]&&_0x4b2b29[_0x3a4525(0x1d0)]['unref']&&_0x4b2b29[_0x3a4525(0x1d0)][_0x3a4525(0x273)](),_0x4ac8e4(_0x4b2b29);},_0x4b2b29['onclose']=()=>{var _0x44b878=_0x26d05b;this[_0x44b878(0x20b)]=!0x0,this['_disposeWebsocket'](_0x4b2b29),this[_0x44b878(0x219)]();},_0x4b2b29[_0x26d05b(0x1c6)]=_0x53ca63=>{var _0x13c592=_0x26d05b;try{if(!(_0x53ca63!=null&&_0x53ca63['data'])||!this[_0x13c592(0x235)])return;let _0x189373=JSON[_0x13c592(0x18c)](_0x53ca63[_0x13c592(0x19c)]);this['eventReceivedCallback'](_0x189373[_0x13c592(0x1f0)],_0x189373[_0x13c592(0x265)],this['global'],this['_inBrowser']);}catch{}};})['then'](_0x33419b=>(this[_0x3a836a(0x1c2)]=!0x0,this['_connecting']=!0x1,this[_0x3a836a(0x20b)]=!0x1,this[_0x3a836a(0x203)]=!0x0,this[_0x3a836a(0x191)]=0x0,_0x33419b))[_0x3a836a(0x1ce)](_0x1bf25e=>(this['_connected']=!0x1,this[_0x3a836a(0x211)]=!0x1,console['warn'](_0x3a836a(0x24a)+this[_0x3a836a(0x25b)]),_0x63d394(new Error(_0x3a836a(0x23e)+(_0x1bf25e&&_0x1bf25e[_0x3a836a(0x198)])))));}));},z[_0x3ea9a1(0x233)]['_disposeWebsocket']=function(_0x260fb4){var _0x527485=_0x3ea9a1;this['_connected']=!0x1,this[_0x527485(0x211)]=!0x1;try{_0x260fb4[_0x527485(0x26a)]=null,_0x260fb4['onerror']=null,_0x260fb4[_0x527485(0x196)]=null;}catch{}try{_0x260fb4[_0x527485(0x1d1)]<0x2&&_0x260fb4['close']();}catch{}},z[_0x3ea9a1(0x233)]['_attemptToReconnectShortly']=function(){var _0x13e5ee=_0x3ea9a1;clearTimeout(this[_0x13e5ee(0x1d7)]),!(this[_0x13e5ee(0x191)]>=this[_0x13e5ee(0x266)])&&(this[_0x13e5ee(0x1d7)]=setTimeout(()=>{var _0x1b1353=_0x13e5ee,_0x211fc5;this[_0x1b1353(0x1c2)]||this[_0x1b1353(0x211)]||(this[_0x1b1353(0x208)](),(_0x211fc5=this[_0x1b1353(0x255)])==null||_0x211fc5[_0x1b1353(0x1ce)](()=>this[_0x1b1353(0x219)]()));},0x1f4),this['_reconnectTimeout'][_0x13e5ee(0x273)]&&this[_0x13e5ee(0x1d7)][_0x13e5ee(0x273)]());},z[_0x3ea9a1(0x233)]['send']=async function(_0x11143b){var _0x2ba435=_0x3ea9a1;try{if(!this['_allowedToSend'])return;this[_0x2ba435(0x20b)]&&this[_0x2ba435(0x208)](),(await this[_0x2ba435(0x255)])[_0x2ba435(0x1a1)](JSON['stringify'](_0x11143b));}catch(_0x597037){this[_0x2ba435(0x1a5)]?console[_0x2ba435(0x209)](this['_sendErrorMessage']+':\\x20'+(_0x597037&&_0x597037['message'])):(this[_0x2ba435(0x1a5)]=!0x0,console[_0x2ba435(0x209)](this[_0x2ba435(0x226)]+':\\x20'+(_0x597037&&_0x597037['message']),_0x11143b)),this[_0x2ba435(0x203)]=!0x1,this[_0x2ba435(0x219)]();}};function H(_0x162ff4,_0x38a7e6,_0x5a281f,_0x41c1b9,_0x4dff31,_0x2d208f,_0xf8d497,_0x1becc0=ne){var _0x3e49fd=_0x3ea9a1;let _0x567ade=_0x5a281f[_0x3e49fd(0x1e8)](',')['map'](_0x350e17=>{var _0x2336b2=_0x3e49fd,_0x411b8e,_0x36f9f2,_0xe251df,_0x4ec02d,_0x577138,_0x5b4fc5,_0x235f56,_0x22f0ea;try{if(!_0x162ff4[_0x2336b2(0x18b)]){let _0x2ef5c7=((_0x36f9f2=(_0x411b8e=_0x162ff4['process'])==null?void 0x0:_0x411b8e[_0x2336b2(0x247)])==null?void 0x0:_0x36f9f2['node'])||((_0x4ec02d=(_0xe251df=_0x162ff4[_0x2336b2(0x17a)])==null?void 0x0:_0xe251df['env'])==null?void 0x0:_0x4ec02d[_0x2336b2(0x229)])===_0x2336b2(0x19e);(_0x4dff31==='next.js'||_0x4dff31===_0x2336b2(0x23c)||_0x4dff31===_0x2336b2(0x1c3)||_0x4dff31===_0x2336b2(0x1e1))&&(_0x4dff31+=_0x2ef5c7?'\\x20server':_0x2336b2(0x230));let _0x6e7c30='';_0x4dff31===_0x2336b2(0x1a9)&&(_0x6e7c30=(((_0x235f56=(_0x5b4fc5=(_0x577138=_0x162ff4['expo'])==null?void 0x0:_0x577138['modules'])==null?void 0x0:_0x5b4fc5[_0x2336b2(0x268)])==null?void 0x0:_0x235f56[_0x2336b2(0x1c5)])||_0x2336b2(0x169))[_0x2336b2(0x244)](),_0x6e7c30&&(_0x4dff31+='\\x20'+_0x6e7c30,(_0x6e7c30==='android'||_0x6e7c30===_0x2336b2(0x169)&&((_0x22f0ea=_0x162ff4[_0x2336b2(0x21f)])==null?void 0x0:_0x22f0ea[_0x2336b2(0x269)])===_0x2336b2(0x1e0))&&(_0x38a7e6='10.0.2.2'))),_0x162ff4[_0x2336b2(0x18b)]={'id':+new Date(),'tool':_0x4dff31},_0xf8d497&&_0x4dff31&&!_0x2ef5c7&&(_0x6e7c30?console['log'](_0x2336b2(0x243)+_0x6e7c30+_0x2336b2(0x217)):console['log'](_0x2336b2(0x1cf)+(_0x4dff31[_0x2336b2(0x238)](0x0)[_0x2336b2(0x1fc)]()+_0x4dff31[_0x2336b2(0x181)](0x1))+',','background:\\x20rgb(30,30,30);\\x20color:\\x20rgb(255,213,92)','see\\x20https://tinyurl.com/2vt8jxzw\\x20for\\x20more\\x20info.'));}let _0x203fe6=new z(_0x162ff4,_0x38a7e6,_0x350e17,_0x41c1b9,_0x2d208f,_0x1becc0);return _0x203fe6['send'][_0x2336b2(0x1f7)](_0x203fe6);}catch(_0x27148f){return console[_0x2336b2(0x209)]('logger\\x20failed\\x20to\\x20connect\\x20to\\x20host',_0x27148f&&_0x27148f[_0x2336b2(0x198)]),()=>{};}});return _0x44ce0e=>_0x567ade[_0x3e49fd(0x18a)](_0x5dcd17=>_0x5dcd17(_0x44ce0e));}function ne(_0x376210,_0x1de28f,_0x5169de,_0x4f9c13){var _0x21cf24=_0x3ea9a1;_0x4f9c13&&_0x376210===_0x21cf24(0x1be)&&_0x5169de[_0x21cf24(0x21f)]['reload']();}function _0x35df(_0x2cc427,_0x4cce35){var _0x3657b0=_0x3657();return _0x35df=function(_0x35df61,_0x20232e){_0x35df61=_0x35df61-0x169;var _0x537c74=_0x3657b0[_0x35df61];return _0x537c74;},_0x35df(_0x2cc427,_0x4cce35);}function _0x3657(){var _0x170506=['charAt','','props','serialize','remix','url','failed\\x20to\\x20connect\\x20to\\x20host:\\x20','set','stringify','_HTMLAllCollection','depth','Console\\x20Ninja\\x20extension\\x20is\\x20connected\\x20to\\x20','toLowerCase','test','some','versions','error','disabledTrace','logger\\x20failed\\x20to\\x20connect\\x20to\\x20host,\\x20see\\x20','allStrLength','console','_setNodeLabel','_ninjaIgnoreNextError','WebSocket','date','_dateToString','isArray','current','call','_ws','autoExpand','[object\\x20Map]','pop','8787191FnAjna','expo','_webSocketErrorDocsLink','level','getOwnPropertyDescriptor','_treeNodePropertiesBeforeFullValue','iterator','getter','5653373pHibBW','reduceOnAccumulatedProcessingTimeMs','capped','getWebSocketClass','args','_maxConnectAttemptCount','object','ExpoDevice','hostname','onclose','reducePolicy','_additionalMetadata','trace','endsWith','positiveInfinity','_setNodeId','index','_getOwnPropertyNames','unref','emulator','[object\\x20Set]','_isPrimitiveType','constructor','_WebSocket','_setNodeExpressionPath','totalStrLength','strLength','defaultLimits','https://tinyurl.com/37x8b79t','_sortProps',[\"localhost\",\"127.0.0.1\",\"example.cypress.io\",\"10.0.2.2\",\"Shrutis-MacBook-Air.local\",\"100.67.69.141\"],'471630qKcgQD','next.js','autoExpandPreviousObjects','Console\\x20Ninja\\x20failed\\x20to\\x20send\\x20logs,\\x20refreshing\\x20the\\x20page\\x20may\\x20help;\\x20also\\x20see\\x20','[object\\x20Date]','process','127.0.0.1','log','import(\\x27path\\x27)','function','disabledLog','_getOwnPropertySymbols','substr','autoExpandMaxDepth','global','_inNextEdge','modules','return\\x20import(url.pathToFileURL(path.join(nodeModules,\\x20\\x27ws/index.js\\x27)).toString());','count','resetOnProcessingTimeAverageMs','fromCharCode','forEach','_console_ninja_session','parse','3091047TDplKU','indexOf','_console_ninja','24XEnZWV','_connectAttemptCount','expressionsToEvaluate','Console\\x20Ninja\\x20failed\\x20to\\x20send\\x20logs,\\x20restarting\\x20the\\x20process\\x20may\\x20help;\\x20also\\x20see\\x20','null','28815NwIpTz','onopen','27EKZBkY','message','8HOjyeR','resetWhenQuietMs','_quotedRegExp','data','NEGATIVE_INFINITY','edge','HTMLAllCollection','_getOwnPropertyDescriptor','send','_propertyName','elements','1768721069957','_extendedWarning','node','push','performance','react-native','cappedProps','resolveGetters','_setNodeQueryPath','failed\\x20to\\x20find\\x20and\\x20load\\x20WebSocket','_consoleNinjaAllowedToStart','_hasSymbolPropertyOnItsPath',\"/Users/shrut/.vscode/extensions/wallabyjs.console-ninja-1.0.508/node_modules\",'boolean','getOwnPropertyNames','_addProperty','_addLoadNode','Symbol','_cleanNode','sort','reducedLimits','1.0.0','time','Set','get','Number','reload','_regExpToString','replace','autoExpandPropertyCount','_connected','astro','toString','osName','onmessage','nan','_property','default','_isPrimitiveWrapperType','symbol','_isMap','includes','catch','%c\\x20Console\\x20Ninja\\x20extension\\x20is\\x20connected\\x20to\\x20','_socket','readyState','nodeModules','perLogpoint','Map','reduceLimits','parent','_reconnectTimeout','_isSet','hits','autoExpandLimit','unknown','next.js','_WebSocketClass','RegExp','valueOf','10.0.2.2','angular','_objectToString','value','concat','','startsWith','1','split','rootExpression','path','ws://','coverage','_type','type','env','method','onerror','Error','logger\\x20websocket\\x20error','4591998JSFYlw','now','match','bind','negativeZero','[object\\x20Array]','ninjaSuppressConsole','hrtime','toUpperCase','_isNegativeZero','host','_keyStrRegExp','_p_',{\"resolveGetters\":false,\"defaultLimits\":{\"props\":100,\"elements\":100,\"strLength\":51200,\"totalStrLength\":51200,\"autoExpandLimit\":5000,\"autoExpandMaxDepth\":10},\"reducedLimits\":{\"props\":5,\"elements\":5,\"strLength\":256,\"totalStrLength\":768,\"autoExpandLimit\":30,\"autoExpandMaxDepth\":2},\"reducePolicy\":{\"perLogpoint\":{\"reduceOnCount\":50,\"reduceOnAccumulatedProcessingTimeMs\":100,\"resetWhenQuietMs\":500,\"resetOnProcessingTimeAverageMs\":100},\"global\":{\"reduceOnCount\":1000,\"reduceOnAccumulatedProcessingTimeMs\":300,\"resetWhenQuietMs\":50,\"resetOnProcessingTimeAverageMs\":100}}},'bigint','_allowedToSend','_p_length','gateway.docker.internal','length','reduceOnCount','_connectToHostNow','warn','undefined','_allowedToConnectOnSend','_Symbol','_addFunctionsNode','timeStamp','12jRGdCY','Promise','_connecting','origin','root_exp','_processTreeNodeResult','name','2thpKFG',',\\x20see\\x20https://tinyurl.com/2vt8jxzw\\x20for\\x20more\\x20info.','resolve','_attemptToReconnectShortly','import(\\x27url\\x27)','expId','_blacklistedProperty','negativeInfinity','getOwnPropertySymbols','location','elapsed','array','53476','root_exp_id','isExpressionToEvaluate','_capIfString','_sendErrorMessage','_treeNodePropertiesAfterFullValue','_inBrowser','NEXT_RUNTIME','port','slice','number','noFunctions','_addObjectProperty','...','\\x20browser','2817030UYMaXd','string','prototype','_setNodeExpandableState','eventReceivedCallback','setter','String'];_0x3657=function(){return _0x170506;};return _0x3657();}function b(_0x5cb47b){var _0x1131a9=_0x3ea9a1,_0x1f858a,_0x36ec49;let _0x34e6e6=function(_0x2a1d47,_0x5872a1){return _0x5872a1-_0x2a1d47;},_0x5d07cd;if(_0x5cb47b[_0x1131a9(0x1a8)])_0x5d07cd=function(){var _0x4d6c8b=_0x1131a9;return _0x5cb47b[_0x4d6c8b(0x1a8)]['now']();};else{if(_0x5cb47b[_0x1131a9(0x17a)]&&_0x5cb47b[_0x1131a9(0x17a)]['hrtime']&&((_0x36ec49=(_0x1f858a=_0x5cb47b[_0x1131a9(0x17a)])==null?void 0x0:_0x1f858a['env'])==null?void 0x0:_0x36ec49[_0x1131a9(0x229)])!==_0x1131a9(0x19e))_0x5d07cd=function(){var _0x485186=_0x1131a9;return _0x5cb47b[_0x485186(0x17a)][_0x485186(0x1fb)]();},_0x34e6e6=function(_0x234c6a,_0x3ffb6c){return 0x3e8*(_0x3ffb6c[0x0]-_0x234c6a[0x0])+(_0x3ffb6c[0x1]-_0x234c6a[0x1])/0xf4240;};else try{let {performance:_0x4cdd33}=require('perf_hooks');_0x5d07cd=function(){var _0x2d6f1b=_0x1131a9;return _0x4cdd33[_0x2d6f1b(0x1f5)]();};}catch{_0x5d07cd=function(){return+new Date();};}}return{'elapsed':_0x34e6e6,'timeStamp':_0x5d07cd,'now':()=>Date['now']()};}function X(_0x433166,_0x5b02e9,_0x4f99b7){var _0x213a79=_0x3ea9a1,_0x59dbe9,_0x9e247a,_0x13a05b,_0x28e090,_0x45f273,_0x4d0cad,_0x15cd38;if(_0x433166[_0x213a79(0x1ae)]!==void 0x0)return _0x433166[_0x213a79(0x1ae)];let _0x25343d=((_0x9e247a=(_0x59dbe9=_0x433166[_0x213a79(0x17a)])==null?void 0x0:_0x59dbe9[_0x213a79(0x247)])==null?void 0x0:_0x9e247a[_0x213a79(0x1a6)])||((_0x28e090=(_0x13a05b=_0x433166['process'])==null?void 0x0:_0x13a05b[_0x213a79(0x1ef)])==null?void 0x0:_0x28e090[_0x213a79(0x229)])===_0x213a79(0x19e),_0x49d724=!!(_0x4f99b7===_0x213a79(0x1a9)&&((_0x45f273=_0x433166[_0x213a79(0x25a)])==null?void 0x0:_0x45f273[_0x213a79(0x185)]));function _0x4b7246(_0x13e5bb){var _0x3eb11d=_0x213a79;if(_0x13e5bb[_0x3eb11d(0x1e6)]('/')&&_0x13e5bb[_0x3eb11d(0x26e)]('/')){let _0x2f1874=new RegExp(_0x13e5bb['slice'](0x1,-0x1));return _0x2265b6=>_0x2f1874[_0x3eb11d(0x245)](_0x2265b6);}else{if(_0x13e5bb[_0x3eb11d(0x1cd)]('*')||_0x13e5bb[_0x3eb11d(0x1cd)]('?')){let _0x5f38ee=new RegExp('^'+_0x13e5bb[_0x3eb11d(0x1c0)](/\\./g,String[_0x3eb11d(0x189)](0x5c)+'.')[_0x3eb11d(0x1c0)](/\\*/g,'.*')[_0x3eb11d(0x1c0)](/\\?/g,'.')+String['fromCharCode'](0x24));return _0x2d2126=>_0x5f38ee[_0x3eb11d(0x245)](_0x2d2126);}else return _0x16e3a8=>_0x16e3a8===_0x13e5bb;}}let _0x28e10b=_0x5b02e9['map'](_0x4b7246);return _0x433166['_consoleNinjaAllowedToStart']=_0x25343d||!_0x5b02e9,!_0x433166[_0x213a79(0x1ae)]&&((_0x4d0cad=_0x433166[_0x213a79(0x21f)])==null?void 0x0:_0x4d0cad[_0x213a79(0x269)])&&(_0x433166[_0x213a79(0x1ae)]=_0x28e10b[_0x213a79(0x246)](_0x4b6860=>_0x4b6860(_0x433166[_0x213a79(0x21f)][_0x213a79(0x269)]))),_0x49d724&&!_0x433166['_consoleNinjaAllowedToStart']&&!((_0x15cd38=_0x433166[_0x213a79(0x21f)])!=null&&_0x15cd38[_0x213a79(0x269)])&&(_0x433166[_0x213a79(0x1ae)]=!0x0),_0x433166['_consoleNinjaAllowedToStart'];}function J(_0x2c5cb5,_0xbcafcf,_0x133d80,_0x51850a,_0x29b76c,_0xb2db7d){var _0x837605=_0x3ea9a1;_0x2c5cb5=_0x2c5cb5,_0xbcafcf=_0xbcafcf,_0x133d80=_0x133d80,_0x51850a=_0x51850a,_0x29b76c=_0x29b76c,_0x29b76c=_0x29b76c||{},_0x29b76c['defaultLimits']=_0x29b76c[_0x837605(0x171)]||{},_0x29b76c[_0x837605(0x1b8)]=_0x29b76c['reducedLimits']||{},_0x29b76c[_0x837605(0x26b)]=_0x29b76c[_0x837605(0x26b)]||{},_0x29b76c[_0x837605(0x26b)]['perLogpoint']=_0x29b76c[_0x837605(0x26b)][_0x837605(0x1d3)]||{},_0x29b76c[_0x837605(0x26b)]['global']=_0x29b76c['reducePolicy']['global']||{};let _0x42c20c={'perLogpoint':{'reduceOnCount':_0x29b76c['reducePolicy'][_0x837605(0x1d3)][_0x837605(0x207)]||0x32,'reduceOnAccumulatedProcessingTimeMs':_0x29b76c[_0x837605(0x26b)]['perLogpoint'][_0x837605(0x262)]||0x64,'resetWhenQuietMs':_0x29b76c[_0x837605(0x26b)][_0x837605(0x1d3)][_0x837605(0x19a)]||0x1f4,'resetOnProcessingTimeAverageMs':_0x29b76c[_0x837605(0x26b)][_0x837605(0x1d3)][_0x837605(0x188)]||0x64},'global':{'reduceOnCount':_0x29b76c[_0x837605(0x26b)][_0x837605(0x183)][_0x837605(0x207)]||0x3e8,'reduceOnAccumulatedProcessingTimeMs':_0x29b76c['reducePolicy'][_0x837605(0x183)]['reduceOnAccumulatedProcessingTimeMs']||0x12c,'resetWhenQuietMs':_0x29b76c['reducePolicy'][_0x837605(0x183)]['resetWhenQuietMs']||0x32,'resetOnProcessingTimeAverageMs':_0x29b76c['reducePolicy']['global'][_0x837605(0x188)]||0x64}},_0x4f1817=b(_0x2c5cb5),_0x5b3db0=_0x4f1817['elapsed'],_0x4c3089=_0x4f1817['timeStamp'];function _0x148a83(){var _0x468854=_0x837605;this[_0x468854(0x1ff)]=/^(?!(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$)[_$a-zA-Z\\xA0-\\uFFFF][_$a-zA-Z0-9\\xA0-\\uFFFF]*$/,this['_numberRegExp']=/^(0|[1-9][0-9]*)$/,this[_0x468854(0x19b)]=/'([^\\\\']|\\\\')*'/,this['_undefined']=_0x2c5cb5['undefined'],this[_0x468854(0x241)]=_0x2c5cb5[_0x468854(0x19f)],this[_0x468854(0x1a0)]=Object[_0x468854(0x25d)],this[_0x468854(0x272)]=Object[_0x468854(0x1b2)],this[_0x468854(0x20c)]=_0x2c5cb5[_0x468854(0x1b5)],this[_0x468854(0x1bf)]=RegExp['prototype']['toString'],this[_0x468854(0x251)]=Date[_0x468854(0x233)][_0x468854(0x1c4)];}_0x148a83['prototype'][_0x837605(0x23b)]=function(_0x254f7e,_0x1b8ef6,_0x223a6a,_0x437262){var _0x5e086d=_0x837605,_0x137f70=this,_0x27ad61=_0x223a6a[_0x5e086d(0x256)];function _0x2aaf65(_0xbb8731,_0x5325bc,_0x40bcbf){var _0x1d8ebe=_0x5e086d;_0x5325bc[_0x1d8ebe(0x1ee)]=_0x1d8ebe(0x1db),_0x5325bc['error']=_0xbb8731[_0x1d8ebe(0x198)],_0x2b3cba=_0x40bcbf['node'][_0x1d8ebe(0x253)],_0x40bcbf[_0x1d8ebe(0x1a6)][_0x1d8ebe(0x253)]=_0x5325bc,_0x137f70[_0x1d8ebe(0x25e)](_0x5325bc,_0x40bcbf);}let _0x538dd6,_0x2fafb6,_0x207829=_0x2c5cb5['ninjaSuppressConsole'];_0x2c5cb5['ninjaSuppressConsole']=!0x0,_0x2c5cb5[_0x5e086d(0x24c)]&&(_0x538dd6=_0x2c5cb5[_0x5e086d(0x24c)][_0x5e086d(0x248)],_0x2fafb6=_0x2c5cb5[_0x5e086d(0x24c)][_0x5e086d(0x209)],_0x538dd6&&(_0x2c5cb5[_0x5e086d(0x24c)][_0x5e086d(0x248)]=function(){}),_0x2fafb6&&(_0x2c5cb5[_0x5e086d(0x24c)][_0x5e086d(0x209)]=function(){}));try{try{_0x223a6a[_0x5e086d(0x25c)]++,_0x223a6a[_0x5e086d(0x256)]&&_0x223a6a[_0x5e086d(0x177)][_0x5e086d(0x1a7)](_0x1b8ef6);var _0x5c1ffd,_0x1d53d9,_0x2cdd7d,_0x4debd,_0x100568=[],_0x2dc40c=[],_0x5f44c5,_0x149aaa=this[_0x5e086d(0x1ed)](_0x1b8ef6),_0x37b9e0=_0x149aaa===_0x5e086d(0x221),_0x4dc8ea=!0x1,_0x31d802=_0x149aaa===_0x5e086d(0x17e),_0x45b0e7=this[_0x5e086d(0x16b)](_0x149aaa),_0x2c57f7=this[_0x5e086d(0x1ca)](_0x149aaa),_0x2b7df8=_0x45b0e7||_0x2c57f7,_0x4e03da={},_0x550b6d=0x0,_0x40806c=!0x1,_0x2b3cba,_0x51b2fa=/^(([1-9]{1}[0-9]*)|0)$/;if(_0x223a6a['depth']){if(_0x37b9e0){if(_0x1d53d9=_0x1b8ef6[_0x5e086d(0x206)],_0x1d53d9>_0x223a6a[_0x5e086d(0x1a3)]){for(_0x2cdd7d=0x0,_0x4debd=_0x223a6a[_0x5e086d(0x1a3)],_0x5c1ffd=_0x2cdd7d;_0x5c1ffd<_0x4debd;_0x5c1ffd++)_0x2dc40c[_0x5e086d(0x1a7)](_0x137f70[_0x5e086d(0x1b3)](_0x100568,_0x1b8ef6,_0x149aaa,_0x5c1ffd,_0x223a6a));_0x254f7e['cappedElements']=!0x0;}else{for(_0x2cdd7d=0x0,_0x4debd=_0x1d53d9,_0x5c1ffd=_0x2cdd7d;_0x5c1ffd<_0x4debd;_0x5c1ffd++)_0x2dc40c['push'](_0x137f70[_0x5e086d(0x1b3)](_0x100568,_0x1b8ef6,_0x149aaa,_0x5c1ffd,_0x223a6a));}_0x223a6a[_0x5e086d(0x1c1)]+=_0x2dc40c[_0x5e086d(0x206)];}if(!(_0x149aaa===_0x5e086d(0x194)||_0x149aaa===_0x5e086d(0x20a))&&!_0x45b0e7&&_0x149aaa!==_0x5e086d(0x237)&&_0x149aaa!=='Buffer'&&_0x149aaa!==_0x5e086d(0x202)){var _0xac6244=_0x437262['props']||_0x223a6a[_0x5e086d(0x23a)];if(this[_0x5e086d(0x1d8)](_0x1b8ef6)?(_0x5c1ffd=0x0,_0x1b8ef6['forEach'](function(_0x1b10e0){var _0x50228d=_0x5e086d;if(_0x550b6d++,_0x223a6a[_0x50228d(0x1c1)]++,_0x550b6d>_0xac6244){_0x40806c=!0x0;return;}if(!_0x223a6a[_0x50228d(0x224)]&&_0x223a6a[_0x50228d(0x256)]&&_0x223a6a[_0x50228d(0x1c1)]>_0x223a6a[_0x50228d(0x1da)]){_0x40806c=!0x0;return;}_0x2dc40c[_0x50228d(0x1a7)](_0x137f70[_0x50228d(0x1b3)](_0x100568,_0x1b8ef6,_0x50228d(0x1bb),_0x5c1ffd++,_0x223a6a,function(_0x917b40){return function(){return _0x917b40;};}(_0x1b10e0)));})):this['_isMap'](_0x1b8ef6)&&_0x1b8ef6[_0x5e086d(0x18a)](function(_0xfccd08,_0x20b282){var _0x585fa5=_0x5e086d;if(_0x550b6d++,_0x223a6a[_0x585fa5(0x1c1)]++,_0x550b6d>_0xac6244){_0x40806c=!0x0;return;}if(!_0x223a6a[_0x585fa5(0x224)]&&_0x223a6a['autoExpand']&&_0x223a6a[_0x585fa5(0x1c1)]>_0x223a6a[_0x585fa5(0x1da)]){_0x40806c=!0x0;return;}var _0x19db4f=_0x20b282[_0x585fa5(0x1c4)]();_0x19db4f[_0x585fa5(0x206)]>0x64&&(_0x19db4f=_0x19db4f[_0x585fa5(0x22b)](0x0,0x64)+_0x585fa5(0x22f)),_0x2dc40c[_0x585fa5(0x1a7)](_0x137f70[_0x585fa5(0x1b3)](_0x100568,_0x1b8ef6,'Map',_0x19db4f,_0x223a6a,function(_0x5721a4){return function(){return _0x5721a4;};}(_0xfccd08)));}),!_0x4dc8ea){try{for(_0x5f44c5 in _0x1b8ef6)if(!(_0x37b9e0&&_0x51b2fa[_0x5e086d(0x245)](_0x5f44c5))&&!this[_0x5e086d(0x21c)](_0x1b8ef6,_0x5f44c5,_0x223a6a)){if(_0x550b6d++,_0x223a6a[_0x5e086d(0x1c1)]++,_0x550b6d>_0xac6244){_0x40806c=!0x0;break;}if(!_0x223a6a[_0x5e086d(0x224)]&&_0x223a6a[_0x5e086d(0x256)]&&_0x223a6a['autoExpandPropertyCount']>_0x223a6a['autoExpandLimit']){_0x40806c=!0x0;break;}_0x2dc40c[_0x5e086d(0x1a7)](_0x137f70[_0x5e086d(0x22e)](_0x100568,_0x4e03da,_0x1b8ef6,_0x149aaa,_0x5f44c5,_0x223a6a));}}catch{}if(_0x4e03da[_0x5e086d(0x204)]=!0x0,_0x31d802&&(_0x4e03da['_p_name']=!0x0),!_0x40806c){var _0x49aeed=[][_0x5e086d(0x1e4)](this[_0x5e086d(0x272)](_0x1b8ef6))[_0x5e086d(0x1e4)](this[_0x5e086d(0x180)](_0x1b8ef6));for(_0x5c1ffd=0x0,_0x1d53d9=_0x49aeed[_0x5e086d(0x206)];_0x5c1ffd<_0x1d53d9;_0x5c1ffd++)if(_0x5f44c5=_0x49aeed[_0x5c1ffd],!(_0x37b9e0&&_0x51b2fa[_0x5e086d(0x245)](_0x5f44c5[_0x5e086d(0x1c4)]()))&&!this['_blacklistedProperty'](_0x1b8ef6,_0x5f44c5,_0x223a6a)&&!_0x4e03da[typeof _0x5f44c5!=_0x5e086d(0x1cb)?'_p_'+_0x5f44c5[_0x5e086d(0x1c4)]():_0x5f44c5]){if(_0x550b6d++,_0x223a6a['autoExpandPropertyCount']++,_0x550b6d>_0xac6244){_0x40806c=!0x0;break;}if(!_0x223a6a['isExpressionToEvaluate']&&_0x223a6a[_0x5e086d(0x256)]&&_0x223a6a[_0x5e086d(0x1c1)]>_0x223a6a[_0x5e086d(0x1da)]){_0x40806c=!0x0;break;}_0x2dc40c[_0x5e086d(0x1a7)](_0x137f70['_addObjectProperty'](_0x100568,_0x4e03da,_0x1b8ef6,_0x149aaa,_0x5f44c5,_0x223a6a));}}}}}if(_0x254f7e[_0x5e086d(0x1ee)]=_0x149aaa,_0x2b7df8?(_0x254f7e[_0x5e086d(0x1e3)]=_0x1b8ef6[_0x5e086d(0x1df)](),this[_0x5e086d(0x225)](_0x149aaa,_0x254f7e,_0x223a6a,_0x437262)):_0x149aaa==='date'?_0x254f7e['value']=this[_0x5e086d(0x251)]['call'](_0x1b8ef6):_0x149aaa===_0x5e086d(0x202)?_0x254f7e['value']=_0x1b8ef6['toString']():_0x149aaa===_0x5e086d(0x1de)?_0x254f7e[_0x5e086d(0x1e3)]=this[_0x5e086d(0x1bf)][_0x5e086d(0x254)](_0x1b8ef6):_0x149aaa==='symbol'&&this[_0x5e086d(0x20c)]?_0x254f7e['value']=this['_Symbol'][_0x5e086d(0x233)][_0x5e086d(0x1c4)]['call'](_0x1b8ef6):!_0x223a6a['depth']&&!(_0x149aaa===_0x5e086d(0x194)||_0x149aaa===_0x5e086d(0x20a))&&(delete _0x254f7e[_0x5e086d(0x1e3)],_0x254f7e[_0x5e086d(0x263)]=!0x0),_0x40806c&&(_0x254f7e[_0x5e086d(0x1aa)]=!0x0),_0x2b3cba=_0x223a6a['node'][_0x5e086d(0x253)],_0x223a6a[_0x5e086d(0x1a6)][_0x5e086d(0x253)]=_0x254f7e,this[_0x5e086d(0x25e)](_0x254f7e,_0x223a6a),_0x2dc40c[_0x5e086d(0x206)]){for(_0x5c1ffd=0x0,_0x1d53d9=_0x2dc40c[_0x5e086d(0x206)];_0x5c1ffd<_0x1d53d9;_0x5c1ffd++)_0x2dc40c[_0x5c1ffd](_0x5c1ffd);}_0x100568[_0x5e086d(0x206)]&&(_0x254f7e[_0x5e086d(0x23a)]=_0x100568);}catch(_0x588dfb){_0x2aaf65(_0x588dfb,_0x254f7e,_0x223a6a);}this[_0x5e086d(0x26c)](_0x1b8ef6,_0x254f7e),this[_0x5e086d(0x227)](_0x254f7e,_0x223a6a),_0x223a6a[_0x5e086d(0x1a6)][_0x5e086d(0x253)]=_0x2b3cba,_0x223a6a['level']--,_0x223a6a[_0x5e086d(0x256)]=_0x27ad61,_0x223a6a[_0x5e086d(0x256)]&&_0x223a6a[_0x5e086d(0x177)][_0x5e086d(0x258)]();}finally{_0x538dd6&&(_0x2c5cb5[_0x5e086d(0x24c)]['error']=_0x538dd6),_0x2fafb6&&(_0x2c5cb5[_0x5e086d(0x24c)][_0x5e086d(0x209)]=_0x2fafb6),_0x2c5cb5[_0x5e086d(0x1fa)]=_0x207829;}return _0x254f7e;},_0x148a83[_0x837605(0x233)][_0x837605(0x180)]=function(_0x5d9402){var _0x317080=_0x837605;return Object[_0x317080(0x21e)]?Object[_0x317080(0x21e)](_0x5d9402):[];},_0x148a83[_0x837605(0x233)][_0x837605(0x1d8)]=function(_0x359760){var _0x564a74=_0x837605;return!!(_0x359760&&_0x2c5cb5[_0x564a74(0x1bb)]&&this[_0x564a74(0x1e2)](_0x359760)===_0x564a74(0x16a)&&_0x359760[_0x564a74(0x18a)]);},_0x148a83[_0x837605(0x233)][_0x837605(0x21c)]=function(_0x467700,_0x1fa9cb,_0x5c874e){var _0x3f4c13=_0x837605;if(!_0x5c874e[_0x3f4c13(0x1ab)]){let _0x1eecfd=this['_getOwnPropertyDescriptor'](_0x467700,_0x1fa9cb);if(_0x1eecfd&&_0x1eecfd[_0x3f4c13(0x1bc)])return!0x0;}return _0x5c874e[_0x3f4c13(0x22d)]?typeof _0x467700[_0x1fa9cb]==_0x3f4c13(0x17e):!0x1;},_0x148a83['prototype'][_0x837605(0x1ed)]=function(_0xf5abe3){var _0x2a84c1=_0x837605,_0x51b2ca='';return _0x51b2ca=typeof _0xf5abe3,_0x51b2ca===_0x2a84c1(0x267)?this['_objectToString'](_0xf5abe3)===_0x2a84c1(0x1f9)?_0x51b2ca=_0x2a84c1(0x221):this['_objectToString'](_0xf5abe3)===_0x2a84c1(0x179)?_0x51b2ca=_0x2a84c1(0x250):this['_objectToString'](_0xf5abe3)==='[object\\x20BigInt]'?_0x51b2ca=_0x2a84c1(0x202):_0xf5abe3===null?_0x51b2ca=_0x2a84c1(0x194):_0xf5abe3['constructor']&&(_0x51b2ca=_0xf5abe3[_0x2a84c1(0x16c)][_0x2a84c1(0x215)]||_0x51b2ca):_0x51b2ca===_0x2a84c1(0x20a)&&this[_0x2a84c1(0x241)]&&_0xf5abe3 instanceof this[_0x2a84c1(0x241)]&&(_0x51b2ca=_0x2a84c1(0x19f)),_0x51b2ca;},_0x148a83['prototype']['_objectToString']=function(_0x3a80cc){var _0x34eb65=_0x837605;return Object['prototype'][_0x34eb65(0x1c4)][_0x34eb65(0x254)](_0x3a80cc);},_0x148a83[_0x837605(0x233)]['_isPrimitiveType']=function(_0x550df5){var _0x5e5fde=_0x837605;return _0x550df5===_0x5e5fde(0x1b1)||_0x550df5==='string'||_0x550df5===_0x5e5fde(0x22c);},_0x148a83[_0x837605(0x233)]['_isPrimitiveWrapperType']=function(_0x452dae){var _0x2041ad=_0x837605;return _0x452dae==='Boolean'||_0x452dae===_0x2041ad(0x237)||_0x452dae===_0x2041ad(0x1bd);},_0x148a83['prototype'][_0x837605(0x1b3)]=function(_0x232d9a,_0x19a296,_0x27b989,_0x4558ec,_0x2ca7e7,_0x4ff508){var _0x34ab93=this;return function(_0x1dd73d){var _0x39a08f=_0x35df,_0x5888d6=_0x2ca7e7[_0x39a08f(0x1a6)][_0x39a08f(0x253)],_0x5c2350=_0x2ca7e7[_0x39a08f(0x1a6)]['index'],_0x2085dc=_0x2ca7e7[_0x39a08f(0x1a6)][_0x39a08f(0x1d6)];_0x2ca7e7[_0x39a08f(0x1a6)][_0x39a08f(0x1d6)]=_0x5888d6,_0x2ca7e7[_0x39a08f(0x1a6)]['index']=typeof _0x4558ec==_0x39a08f(0x22c)?_0x4558ec:_0x1dd73d,_0x232d9a[_0x39a08f(0x1a7)](_0x34ab93[_0x39a08f(0x1c8)](_0x19a296,_0x27b989,_0x4558ec,_0x2ca7e7,_0x4ff508)),_0x2ca7e7[_0x39a08f(0x1a6)]['parent']=_0x2085dc,_0x2ca7e7[_0x39a08f(0x1a6)][_0x39a08f(0x271)]=_0x5c2350;};},_0x148a83[_0x837605(0x233)][_0x837605(0x22e)]=function(_0x44847f,_0x205d7e,_0x3813ba,_0x54f58f,_0x5710cc,_0x470efd,_0x300cf3){var _0x2060c6=_0x837605,_0x45e540=this;return _0x205d7e[typeof _0x5710cc!=_0x2060c6(0x1cb)?_0x2060c6(0x200)+_0x5710cc['toString']():_0x5710cc]=!0x0,function(_0x4ad229){var _0x1fcea2=_0x2060c6,_0x10d5e3=_0x470efd[_0x1fcea2(0x1a6)]['current'],_0x35d996=_0x470efd['node'][_0x1fcea2(0x271)],_0xd55143=_0x470efd[_0x1fcea2(0x1a6)][_0x1fcea2(0x1d6)];_0x470efd['node'][_0x1fcea2(0x1d6)]=_0x10d5e3,_0x470efd[_0x1fcea2(0x1a6)][_0x1fcea2(0x271)]=_0x4ad229,_0x44847f['push'](_0x45e540[_0x1fcea2(0x1c8)](_0x3813ba,_0x54f58f,_0x5710cc,_0x470efd,_0x300cf3)),_0x470efd[_0x1fcea2(0x1a6)][_0x1fcea2(0x1d6)]=_0xd55143,_0x470efd['node'][_0x1fcea2(0x271)]=_0x35d996;};},_0x148a83[_0x837605(0x233)][_0x837605(0x1c8)]=function(_0xd836ce,_0x46a0c3,_0x15f6ac,_0x5b53e6,_0x2042c9){var _0x2565c5=_0x837605,_0x202cb0=this;_0x2042c9||(_0x2042c9=function(_0x5b375c,_0x36f7bf){return _0x5b375c[_0x36f7bf];});var _0x4b60b6=_0x15f6ac[_0x2565c5(0x1c4)](),_0x485172=_0x5b53e6['expressionsToEvaluate']||{},_0x4882e1=_0x5b53e6[_0x2565c5(0x242)],_0x1b061c=_0x5b53e6[_0x2565c5(0x224)];try{var _0x96adf6=this[_0x2565c5(0x1cc)](_0xd836ce),_0x477cb5=_0x4b60b6;_0x96adf6&&_0x477cb5[0x0]==='\\x27'&&(_0x477cb5=_0x477cb5[_0x2565c5(0x181)](0x1,_0x477cb5['length']-0x2));var _0x2e7d82=_0x5b53e6[_0x2565c5(0x192)]=_0x485172[_0x2565c5(0x200)+_0x477cb5];_0x2e7d82&&(_0x5b53e6['depth']=_0x5b53e6['depth']+0x1),_0x5b53e6['isExpressionToEvaluate']=!!_0x2e7d82;var _0x28d8f8=typeof _0x15f6ac==_0x2565c5(0x1cb),_0x43bf70={'name':_0x28d8f8||_0x96adf6?_0x4b60b6:this['_propertyName'](_0x4b60b6)};if(_0x28d8f8&&(_0x43bf70[_0x2565c5(0x1cb)]=!0x0),!(_0x46a0c3===_0x2565c5(0x221)||_0x46a0c3===_0x2565c5(0x1f2))){var _0x4f344d=this[_0x2565c5(0x1a0)](_0xd836ce,_0x15f6ac);if(_0x4f344d&&(_0x4f344d[_0x2565c5(0x23f)]&&(_0x43bf70[_0x2565c5(0x236)]=!0x0),_0x4f344d['get']&&!_0x2e7d82&&!_0x5b53e6[_0x2565c5(0x1ab)]))return _0x43bf70[_0x2565c5(0x260)]=!0x0,this['_processTreeNodeResult'](_0x43bf70,_0x5b53e6),_0x43bf70;}var _0x2e2d50;try{_0x2e2d50=_0x2042c9(_0xd836ce,_0x15f6ac);}catch(_0x8a7d4d){return _0x43bf70={'name':_0x4b60b6,'type':'unknown','error':_0x8a7d4d['message']},this['_processTreeNodeResult'](_0x43bf70,_0x5b53e6),_0x43bf70;}var _0x1d8a17=this[_0x2565c5(0x1ed)](_0x2e2d50),_0x557b18=this[_0x2565c5(0x16b)](_0x1d8a17);if(_0x43bf70['type']=_0x1d8a17,_0x557b18)this['_processTreeNodeResult'](_0x43bf70,_0x5b53e6,_0x2e2d50,function(){var _0x41f73d=_0x2565c5;_0x43bf70[_0x41f73d(0x1e3)]=_0x2e2d50['valueOf'](),!_0x2e7d82&&_0x202cb0[_0x41f73d(0x225)](_0x1d8a17,_0x43bf70,_0x5b53e6,{});});else{var _0x2822be=_0x5b53e6['autoExpand']&&_0x5b53e6[_0x2565c5(0x25c)]<_0x5b53e6[_0x2565c5(0x182)]&&_0x5b53e6[_0x2565c5(0x177)][_0x2565c5(0x18e)](_0x2e2d50)<0x0&&_0x1d8a17!==_0x2565c5(0x17e)&&_0x5b53e6['autoExpandPropertyCount']<_0x5b53e6[_0x2565c5(0x1da)];_0x2822be||_0x5b53e6[_0x2565c5(0x25c)]<_0x4882e1||_0x2e7d82?this[_0x2565c5(0x23b)](_0x43bf70,_0x2e2d50,_0x5b53e6,_0x2e7d82||{}):this[_0x2565c5(0x214)](_0x43bf70,_0x5b53e6,_0x2e2d50,function(){var _0x9e47bf=_0x2565c5;_0x1d8a17==='null'||_0x1d8a17===_0x9e47bf(0x20a)||(delete _0x43bf70['value'],_0x43bf70['capped']=!0x0);});}return _0x43bf70;}finally{_0x5b53e6[_0x2565c5(0x192)]=_0x485172,_0x5b53e6[_0x2565c5(0x242)]=_0x4882e1,_0x5b53e6['isExpressionToEvaluate']=_0x1b061c;}},_0x148a83[_0x837605(0x233)][_0x837605(0x225)]=function(_0xa0253a,_0x394e5a,_0x484357,_0x2813c2){var _0x3bbd33=_0x837605,_0x5af2cf=_0x2813c2['strLength']||_0x484357[_0x3bbd33(0x170)];if((_0xa0253a==='string'||_0xa0253a===_0x3bbd33(0x237))&&_0x394e5a['value']){let _0x2973ee=_0x394e5a[_0x3bbd33(0x1e3)][_0x3bbd33(0x206)];_0x484357['allStrLength']+=_0x2973ee,_0x484357[_0x3bbd33(0x24b)]>_0x484357[_0x3bbd33(0x16f)]?(_0x394e5a[_0x3bbd33(0x263)]='',delete _0x394e5a[_0x3bbd33(0x1e3)]):_0x2973ee>_0x5af2cf&&(_0x394e5a['capped']=_0x394e5a[_0x3bbd33(0x1e3)][_0x3bbd33(0x181)](0x0,_0x5af2cf),delete _0x394e5a[_0x3bbd33(0x1e3)]);}},_0x148a83[_0x837605(0x233)][_0x837605(0x1cc)]=function(_0x288ec5){var _0x1c1397=_0x837605;return!!(_0x288ec5&&_0x2c5cb5['Map']&&this['_objectToString'](_0x288ec5)===_0x1c1397(0x257)&&_0x288ec5[_0x1c1397(0x18a)]);},_0x148a83[_0x837605(0x233)][_0x837605(0x1a2)]=function(_0x24d6c7){var _0x7b8159=_0x837605;if(_0x24d6c7[_0x7b8159(0x1f6)](/^\\d+$/))return _0x24d6c7;var _0x1c019a;try{_0x1c019a=JSON[_0x7b8159(0x240)](''+_0x24d6c7);}catch{_0x1c019a='\\x22'+this[_0x7b8159(0x1e2)](_0x24d6c7)+'\\x22';}return _0x1c019a[_0x7b8159(0x1f6)](/^\"([a-zA-Z_][a-zA-Z_0-9]*)\"$/)?_0x1c019a=_0x1c019a[_0x7b8159(0x181)](0x1,_0x1c019a['length']-0x2):_0x1c019a=_0x1c019a[_0x7b8159(0x1c0)](/'/g,'\\x5c\\x27')[_0x7b8159(0x1c0)](/\\\\\"/g,'\\x22')['replace'](/(^\"|\"$)/g,'\\x27'),_0x1c019a;},_0x148a83['prototype'][_0x837605(0x214)]=function(_0x550471,_0x163d4b,_0x2998e5,_0x338c88){var _0x37fdc5=_0x837605;this[_0x37fdc5(0x25e)](_0x550471,_0x163d4b),_0x338c88&&_0x338c88(),this[_0x37fdc5(0x26c)](_0x2998e5,_0x550471),this[_0x37fdc5(0x227)](_0x550471,_0x163d4b);},_0x148a83['prototype']['_treeNodePropertiesBeforeFullValue']=function(_0x271c86,_0x4681b6){var _0x424b1a=_0x837605;this[_0x424b1a(0x270)](_0x271c86,_0x4681b6),this[_0x424b1a(0x1ac)](_0x271c86,_0x4681b6),this['_setNodeExpressionPath'](_0x271c86,_0x4681b6),this['_setNodePermissions'](_0x271c86,_0x4681b6);},_0x148a83[_0x837605(0x233)][_0x837605(0x270)]=function(_0x4a06db,_0x52ce96){},_0x148a83[_0x837605(0x233)][_0x837605(0x1ac)]=function(_0x40789e,_0x802a13){},_0x148a83[_0x837605(0x233)][_0x837605(0x24d)]=function(_0x3352c8,_0x47a3b9){},_0x148a83[_0x837605(0x233)]['_isUndefined']=function(_0x1bd8df){return _0x1bd8df===this['_undefined'];},_0x148a83[_0x837605(0x233)][_0x837605(0x227)]=function(_0x37eb0e,_0x314299){var _0x5678fd=_0x837605;this[_0x5678fd(0x24d)](_0x37eb0e,_0x314299),this[_0x5678fd(0x234)](_0x37eb0e),_0x314299['sortProps']&&this[_0x5678fd(0x173)](_0x37eb0e),this[_0x5678fd(0x20d)](_0x37eb0e,_0x314299),this[_0x5678fd(0x1b4)](_0x37eb0e,_0x314299),this[_0x5678fd(0x1b6)](_0x37eb0e);},_0x148a83[_0x837605(0x233)]['_additionalMetadata']=function(_0x160b33,_0x3d676d){var _0x3b1b51=_0x837605;try{_0x160b33&&typeof _0x160b33[_0x3b1b51(0x206)]=='number'&&(_0x3d676d[_0x3b1b51(0x206)]=_0x160b33[_0x3b1b51(0x206)]);}catch{}if(_0x3d676d['type']===_0x3b1b51(0x22c)||_0x3d676d[_0x3b1b51(0x1ee)]===_0x3b1b51(0x1bd)){if(isNaN(_0x3d676d[_0x3b1b51(0x1e3)]))_0x3d676d[_0x3b1b51(0x1c7)]=!0x0,delete _0x3d676d['value'];else switch(_0x3d676d['value']){case Number['POSITIVE_INFINITY']:_0x3d676d[_0x3b1b51(0x26f)]=!0x0,delete _0x3d676d[_0x3b1b51(0x1e3)];break;case Number[_0x3b1b51(0x19d)]:_0x3d676d[_0x3b1b51(0x21d)]=!0x0,delete _0x3d676d['value'];break;case 0x0:this[_0x3b1b51(0x1fd)](_0x3d676d[_0x3b1b51(0x1e3)])&&(_0x3d676d[_0x3b1b51(0x1f8)]=!0x0);break;}}else _0x3d676d['type']===_0x3b1b51(0x17e)&&typeof _0x160b33[_0x3b1b51(0x215)]==_0x3b1b51(0x232)&&_0x160b33[_0x3b1b51(0x215)]&&_0x3d676d[_0x3b1b51(0x215)]&&_0x160b33[_0x3b1b51(0x215)]!==_0x3d676d[_0x3b1b51(0x215)]&&(_0x3d676d['funcName']=_0x160b33[_0x3b1b51(0x215)]);},_0x148a83['prototype']['_isNegativeZero']=function(_0x3255f1){var _0xf70e2b=_0x837605;return 0x1/_0x3255f1===Number[_0xf70e2b(0x19d)];},_0x148a83[_0x837605(0x233)][_0x837605(0x173)]=function(_0xcf77f3){var _0x4f0c69=_0x837605;!_0xcf77f3[_0x4f0c69(0x23a)]||!_0xcf77f3[_0x4f0c69(0x23a)][_0x4f0c69(0x206)]||_0xcf77f3[_0x4f0c69(0x1ee)]===_0x4f0c69(0x221)||_0xcf77f3[_0x4f0c69(0x1ee)]===_0x4f0c69(0x1d4)||_0xcf77f3[_0x4f0c69(0x1ee)]==='Set'||_0xcf77f3['props'][_0x4f0c69(0x1b7)](function(_0x2fbd6c,_0x4d352b){var _0x23e415=_0x4f0c69,_0x593695=_0x2fbd6c[_0x23e415(0x215)]['toLowerCase'](),_0x3942dc=_0x4d352b[_0x23e415(0x215)][_0x23e415(0x244)]();return _0x593695<_0x3942dc?-0x1:_0x593695>_0x3942dc?0x1:0x0;});},_0x148a83[_0x837605(0x233)]['_addFunctionsNode']=function(_0x6f8db9,_0x77d67e){var _0x1c369c=_0x837605;if(!(_0x77d67e[_0x1c369c(0x22d)]||!_0x6f8db9[_0x1c369c(0x23a)]||!_0x6f8db9[_0x1c369c(0x23a)][_0x1c369c(0x206)])){for(var _0xd1921c=[],_0x20ea50=[],_0x1db020=0x0,_0x496fac=_0x6f8db9['props']['length'];_0x1db020<_0x496fac;_0x1db020++){var _0x203e33=_0x6f8db9[_0x1c369c(0x23a)][_0x1db020];_0x203e33['type']===_0x1c369c(0x17e)?_0xd1921c[_0x1c369c(0x1a7)](_0x203e33):_0x20ea50[_0x1c369c(0x1a7)](_0x203e33);}if(!(!_0x20ea50[_0x1c369c(0x206)]||_0xd1921c['length']<=0x1)){_0x6f8db9[_0x1c369c(0x23a)]=_0x20ea50;var _0x424c56={'functionsNode':!0x0,'props':_0xd1921c};this[_0x1c369c(0x270)](_0x424c56,_0x77d67e),this[_0x1c369c(0x24d)](_0x424c56,_0x77d67e),this[_0x1c369c(0x234)](_0x424c56),this['_setNodePermissions'](_0x424c56,_0x77d67e),_0x424c56['id']+='\\x20f',_0x6f8db9[_0x1c369c(0x23a)]['unshift'](_0x424c56);}}},_0x148a83[_0x837605(0x233)][_0x837605(0x1b4)]=function(_0x2ad3d7,_0x1660d0){},_0x148a83[_0x837605(0x233)][_0x837605(0x234)]=function(_0x26b910){},_0x148a83[_0x837605(0x233)]['_isArray']=function(_0x83357){var _0xaef6d1=_0x837605;return Array[_0xaef6d1(0x252)](_0x83357)||typeof _0x83357=='object'&&this[_0xaef6d1(0x1e2)](_0x83357)===_0xaef6d1(0x1f9);},_0x148a83[_0x837605(0x233)]['_setNodePermissions']=function(_0xb9f64,_0x982cb3){},_0x148a83[_0x837605(0x233)][_0x837605(0x1b6)]=function(_0x4d7ab9){var _0x17ec9f=_0x837605;delete _0x4d7ab9[_0x17ec9f(0x1af)],delete _0x4d7ab9['_hasSetOnItsPath'],delete _0x4d7ab9['_hasMapOnItsPath'];},_0x148a83['prototype'][_0x837605(0x16e)]=function(_0xe5bea7,_0x4a7ff0){};let _0x329413=new _0x148a83(),_0x55cbcb={'props':_0x29b76c[_0x837605(0x171)]['props']||0x64,'elements':_0x29b76c[_0x837605(0x171)][_0x837605(0x1a3)]||0x64,'strLength':_0x29b76c[_0x837605(0x171)][_0x837605(0x170)]||0x400*0x32,'totalStrLength':_0x29b76c['defaultLimits'][_0x837605(0x16f)]||0x400*0x32,'autoExpandLimit':_0x29b76c[_0x837605(0x171)][_0x837605(0x1da)]||0x1388,'autoExpandMaxDepth':_0x29b76c[_0x837605(0x171)][_0x837605(0x182)]||0xa},_0x520c1f={'props':_0x29b76c[_0x837605(0x1b8)][_0x837605(0x23a)]||0x5,'elements':_0x29b76c[_0x837605(0x1b8)]['elements']||0x5,'strLength':_0x29b76c['reducedLimits']['strLength']||0x100,'totalStrLength':_0x29b76c[_0x837605(0x1b8)][_0x837605(0x16f)]||0x100*0x3,'autoExpandLimit':_0x29b76c[_0x837605(0x1b8)][_0x837605(0x1da)]||0x1e,'autoExpandMaxDepth':_0x29b76c['reducedLimits'][_0x837605(0x182)]||0x2};if(_0xb2db7d){let _0x2d3a5e=_0x329413[_0x837605(0x23b)][_0x837605(0x1f7)](_0x329413);_0x329413[_0x837605(0x23b)]=function(_0x9dfa4c,_0x1ad50a,_0x5b6134,_0x1a207d){return _0x2d3a5e(_0x9dfa4c,_0xb2db7d(_0x1ad50a),_0x5b6134,_0x1a207d);};}function _0x49034d(_0xf4e35f,_0x451aa4,_0x34dce7,_0x515047,_0x4b4f2d,_0x2c7519){var _0x53ff39=_0x837605;let _0x1429dd,_0x137189;try{_0x137189=_0x4c3089(),_0x1429dd=_0x133d80[_0x451aa4],!_0x1429dd||_0x137189-_0x1429dd['ts']>_0x42c20c[_0x53ff39(0x1d3)]['resetWhenQuietMs']&&_0x1429dd[_0x53ff39(0x187)]&&_0x1429dd[_0x53ff39(0x1ba)]/_0x1429dd[_0x53ff39(0x187)]<_0x42c20c[_0x53ff39(0x1d3)][_0x53ff39(0x188)]?(_0x133d80[_0x451aa4]=_0x1429dd={'count':0x0,'time':0x0,'ts':_0x137189},_0x133d80[_0x53ff39(0x1d9)]={}):_0x137189-_0x133d80[_0x53ff39(0x1d9)]['ts']>_0x42c20c['global'][_0x53ff39(0x19a)]&&_0x133d80[_0x53ff39(0x1d9)][_0x53ff39(0x187)]&&_0x133d80[_0x53ff39(0x1d9)][_0x53ff39(0x1ba)]/_0x133d80[_0x53ff39(0x1d9)][_0x53ff39(0x187)]<_0x42c20c[_0x53ff39(0x183)][_0x53ff39(0x188)]&&(_0x133d80['hits']={});let _0x4986b7=[],_0x597f8f=_0x1429dd['reduceLimits']||_0x133d80['hits'][_0x53ff39(0x1d5)]?_0x520c1f:_0x55cbcb,_0x252691=_0xf8dd76=>{var _0x55d609=_0x53ff39;let _0x3ecca9={};return _0x3ecca9[_0x55d609(0x23a)]=_0xf8dd76[_0x55d609(0x23a)],_0x3ecca9[_0x55d609(0x1a3)]=_0xf8dd76['elements'],_0x3ecca9[_0x55d609(0x170)]=_0xf8dd76[_0x55d609(0x170)],_0x3ecca9['totalStrLength']=_0xf8dd76[_0x55d609(0x16f)],_0x3ecca9['autoExpandLimit']=_0xf8dd76[_0x55d609(0x1da)],_0x3ecca9['autoExpandMaxDepth']=_0xf8dd76['autoExpandMaxDepth'],_0x3ecca9['sortProps']=!0x1,_0x3ecca9['noFunctions']=!_0xbcafcf,_0x3ecca9[_0x55d609(0x242)]=0x1,_0x3ecca9[_0x55d609(0x25c)]=0x0,_0x3ecca9[_0x55d609(0x21b)]=_0x55d609(0x223),_0x3ecca9[_0x55d609(0x1e9)]=_0x55d609(0x213),_0x3ecca9[_0x55d609(0x256)]=!0x0,_0x3ecca9[_0x55d609(0x177)]=[],_0x3ecca9['autoExpandPropertyCount']=0x0,_0x3ecca9[_0x55d609(0x1ab)]=_0x29b76c[_0x55d609(0x1ab)],_0x3ecca9[_0x55d609(0x24b)]=0x0,_0x3ecca9['node']={'current':void 0x0,'parent':void 0x0,'index':0x0},_0x3ecca9;};for(var _0x549aac=0x0;_0x549aac<_0x4b4f2d[_0x53ff39(0x206)];_0x549aac++)_0x4986b7[_0x53ff39(0x1a7)](_0x329413[_0x53ff39(0x23b)]({'timeNode':_0xf4e35f===_0x53ff39(0x1ba)||void 0x0},_0x4b4f2d[_0x549aac],_0x252691(_0x597f8f),{}));if(_0xf4e35f===_0x53ff39(0x26d)||_0xf4e35f===_0x53ff39(0x248)){let _0x1d03d5=Error['stackTraceLimit'];try{Error['stackTraceLimit']=0x1/0x0,_0x4986b7['push'](_0x329413[_0x53ff39(0x23b)]({'stackNode':!0x0},new Error()['stack'],_0x252691(_0x597f8f),{'strLength':0x1/0x0}));}finally{Error['stackTraceLimit']=_0x1d03d5;}}return{'method':_0x53ff39(0x17c),'version':_0x51850a,'args':[{'ts':_0x34dce7,'session':_0x515047,'args':_0x4986b7,'id':_0x451aa4,'context':_0x2c7519}]};}catch(_0x212b6e){return{'method':_0x53ff39(0x17c),'version':_0x51850a,'args':[{'ts':_0x34dce7,'session':_0x515047,'args':[{'type':_0x53ff39(0x1db),'error':_0x212b6e&&_0x212b6e[_0x53ff39(0x198)]}],'id':_0x451aa4,'context':_0x2c7519}]};}finally{try{if(_0x1429dd&&_0x137189){let _0x59a5a9=_0x4c3089();_0x1429dd[_0x53ff39(0x187)]++,_0x1429dd[_0x53ff39(0x1ba)]+=_0x5b3db0(_0x137189,_0x59a5a9),_0x1429dd['ts']=_0x59a5a9,_0x133d80[_0x53ff39(0x1d9)]['count']++,_0x133d80[_0x53ff39(0x1d9)][_0x53ff39(0x1ba)]+=_0x5b3db0(_0x137189,_0x59a5a9),_0x133d80[_0x53ff39(0x1d9)]['ts']=_0x59a5a9,(_0x1429dd['count']>_0x42c20c[_0x53ff39(0x1d3)][_0x53ff39(0x207)]||_0x1429dd[_0x53ff39(0x1ba)]>_0x42c20c[_0x53ff39(0x1d3)][_0x53ff39(0x262)])&&(_0x1429dd['reduceLimits']=!0x0),(_0x133d80[_0x53ff39(0x1d9)][_0x53ff39(0x187)]>_0x42c20c[_0x53ff39(0x183)]['reduceOnCount']||_0x133d80[_0x53ff39(0x1d9)][_0x53ff39(0x1ba)]>_0x42c20c[_0x53ff39(0x183)][_0x53ff39(0x262)])&&(_0x133d80[_0x53ff39(0x1d9)][_0x53ff39(0x1d5)]=!0x0);}}catch{}}}return _0x49034d;}function G(_0x34f1d1){var _0x2a1472=_0x3ea9a1;if(_0x34f1d1&&typeof _0x34f1d1=='object'&&_0x34f1d1[_0x2a1472(0x16c)])switch(_0x34f1d1[_0x2a1472(0x16c)][_0x2a1472(0x215)]){case _0x2a1472(0x210):return _0x34f1d1['hasOwnProperty'](Symbol[_0x2a1472(0x25f)])?Promise[_0x2a1472(0x218)]():_0x34f1d1;case'bound\\x20Promise':return Promise['resolve']();}return _0x34f1d1;}((_0x4c53dc,_0x2cef24,_0x740e84,_0x8c074a,_0x184e8b,_0x241e4,_0x2090ec,_0x45331a,_0x35a7e7,_0x114da4,_0x47e808,_0x311da8)=>{var _0x31b09b=_0x3ea9a1;if(_0x4c53dc['_console_ninja'])return _0x4c53dc['_console_ninja'];let _0x3e2604={'consoleLog':()=>{},'consoleTrace':()=>{},'consoleTime':()=>{},'consoleTimeEnd':()=>{},'autoLog':()=>{},'autoLogMany':()=>{},'autoTraceMany':()=>{},'coverage':()=>{},'autoTrace':()=>{},'autoTime':()=>{},'autoTimeEnd':()=>{}};if(!X(_0x4c53dc,_0x45331a,_0x184e8b))return _0x4c53dc[_0x31b09b(0x18f)]=_0x3e2604,_0x4c53dc['_console_ninja'];let _0x53384f=b(_0x4c53dc),_0x18745c=_0x53384f[_0x31b09b(0x220)],_0x3a7b20=_0x53384f[_0x31b09b(0x20e)],_0x2e8a66=_0x53384f[_0x31b09b(0x1f5)],_0x279135={'hits':{},'ts':{}},_0x1870ae=J(_0x4c53dc,_0x35a7e7,_0x279135,_0x241e4,_0x311da8,_0x184e8b===_0x31b09b(0x1dc)?G:void 0x0),_0x4ed409=(_0x577d34,_0x2c5445,_0x2d2222,_0x399041,_0x1e9863,_0x44ac4c)=>{var _0x4c72eb=_0x31b09b;let _0x7144f0=_0x4c53dc[_0x4c72eb(0x18f)];try{return _0x4c53dc['_console_ninja']=_0x3e2604,_0x1870ae(_0x577d34,_0x2c5445,_0x2d2222,_0x399041,_0x1e9863,_0x44ac4c);}finally{_0x4c53dc[_0x4c72eb(0x18f)]=_0x7144f0;}},_0x462c39=_0x7624ff=>{_0x279135['ts'][_0x7624ff]=_0x3a7b20();},_0x50b682=(_0x48d55a,_0x252b14)=>{let _0x7c71fa=_0x279135['ts'][_0x252b14];if(delete _0x279135['ts'][_0x252b14],_0x7c71fa){let _0x576e53=_0x18745c(_0x7c71fa,_0x3a7b20());_0x3eeb6c(_0x4ed409('time',_0x48d55a,_0x2e8a66(),_0x3ee074,[_0x576e53],_0x252b14));}},_0x34a185=_0x2239f7=>{var _0x27230b=_0x31b09b,_0xd2919a;return _0x184e8b==='next.js'&&_0x4c53dc['origin']&&((_0xd2919a=_0x2239f7==null?void 0x0:_0x2239f7[_0x27230b(0x265)])==null?void 0x0:_0xd2919a[_0x27230b(0x206)])&&(_0x2239f7[_0x27230b(0x265)][0x0][_0x27230b(0x212)]=_0x4c53dc['origin']),_0x2239f7;};_0x4c53dc[_0x31b09b(0x18f)]={'consoleLog':(_0x37dada,_0x4f7036)=>{var _0x5a915e=_0x31b09b;_0x4c53dc[_0x5a915e(0x24c)]['log']['name']!==_0x5a915e(0x17f)&&_0x3eeb6c(_0x4ed409(_0x5a915e(0x17c),_0x37dada,_0x2e8a66(),_0x3ee074,_0x4f7036));},'consoleTrace':(_0x10e939,_0x1f0813)=>{var _0x130acf=_0x31b09b,_0x4d86a3,_0x39e6a3;_0x4c53dc['console'][_0x130acf(0x17c)][_0x130acf(0x215)]!==_0x130acf(0x249)&&((_0x39e6a3=(_0x4d86a3=_0x4c53dc['process'])==null?void 0x0:_0x4d86a3[_0x130acf(0x247)])!=null&&_0x39e6a3['node']&&(_0x4c53dc[_0x130acf(0x24e)]=!0x0),_0x3eeb6c(_0x34a185(_0x4ed409(_0x130acf(0x26d),_0x10e939,_0x2e8a66(),_0x3ee074,_0x1f0813))));},'consoleError':(_0x27e7ef,_0x50dec3)=>{var _0x101678=_0x31b09b;_0x4c53dc['_ninjaIgnoreNextError']=!0x0,_0x3eeb6c(_0x34a185(_0x4ed409(_0x101678(0x248),_0x27e7ef,_0x2e8a66(),_0x3ee074,_0x50dec3)));},'consoleTime':_0x214702=>{_0x462c39(_0x214702);},'consoleTimeEnd':(_0x33ed55,_0x543cb6)=>{_0x50b682(_0x543cb6,_0x33ed55);},'autoLog':(_0x4b8fdc,_0x2bbedf)=>{_0x3eeb6c(_0x4ed409('log',_0x2bbedf,_0x2e8a66(),_0x3ee074,[_0x4b8fdc]));},'autoLogMany':(_0x5627a5,_0x1e1cdf)=>{var _0x34dbf9=_0x31b09b;_0x3eeb6c(_0x4ed409(_0x34dbf9(0x17c),_0x5627a5,_0x2e8a66(),_0x3ee074,_0x1e1cdf));},'autoTrace':(_0x358b3c,_0x18b2a7)=>{_0x3eeb6c(_0x34a185(_0x4ed409('trace',_0x18b2a7,_0x2e8a66(),_0x3ee074,[_0x358b3c])));},'autoTraceMany':(_0x2d079b,_0x997364)=>{_0x3eeb6c(_0x34a185(_0x4ed409('trace',_0x2d079b,_0x2e8a66(),_0x3ee074,_0x997364)));},'autoTime':(_0x3f4061,_0x402ee5,_0x38d7fc)=>{_0x462c39(_0x38d7fc);},'autoTimeEnd':(_0x5377de,_0x3c67c5,_0x27ee03)=>{_0x50b682(_0x3c67c5,_0x27ee03);},'coverage':_0x12c1bb=>{var _0x27971b=_0x31b09b;_0x3eeb6c({'method':_0x27971b(0x1ec),'version':_0x241e4,'args':[{'id':_0x12c1bb}]});}};let _0x3eeb6c=H(_0x4c53dc,_0x2cef24,_0x740e84,_0x8c074a,_0x184e8b,_0x114da4,_0x47e808),_0x3ee074=_0x4c53dc[_0x31b09b(0x18b)];return _0x4c53dc[_0x31b09b(0x18f)];})(globalThis,_0x3ea9a1(0x17b),_0x3ea9a1(0x222),_0x3ea9a1(0x1b0),_0x3ea9a1(0x176),_0x3ea9a1(0x1b9),_0x3ea9a1(0x1a4),_0x3ea9a1(0x174),_0x3ea9a1(0x1e5),_0x3ea9a1(0x239),_0x3ea9a1(0x1e7),_0x3ea9a1(0x201));");
+    } catch (e) {
+        console.error(e);
+    }
+}
+function oo_oo(i, ...v) {
+    try {
+        oo_cm().consoleLog(i, v);
+    } catch (e) {}
+    return v;
+}
+oo_oo; /* istanbul ignore next */ 
+function oo_tr(i, ...v) {
+    try {
+        oo_cm().consoleTrace(i, v);
+    } catch (e) {}
+    return v;
+}
+oo_tr; /* istanbul ignore next */ 
+function oo_tx(i, ...v) {
+    try {
+        oo_cm().consoleError(i, v);
+    } catch (e) {}
+    return v;
+}
+oo_tx; /* istanbul ignore next */ 
+function oo_ts(v) {
+    try {
+        oo_cm().consoleTime(v);
+    } catch (e) {}
+    return v;
+}
+oo_ts; /* istanbul ignore next */ 
+function oo_te(v, i) {
+    try {
+        oo_cm().consoleTimeEnd(v, i);
+    } catch (e) {}
+    return v;
+}
+oo_te; /*eslint unicorn/no-abusive-eslint-disable:,eslint-comments/disable-enable-pair:,eslint-comments/no-unlimited-disable:,eslint-comments/no-aggregating-enable:,eslint-comments/no-duplicate-disable:,eslint-comments/no-unused-disable:,eslint-comments/no-unused-enable:,*/ 
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     createCourse,
@@ -500,13 +538,13 @@ async function purgeCourseTelemetry(courseId) {
     deleteSubmissionAction,
     purgeCourseTelemetry
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createCourse, "4090343f00ed10f4472b943068f07dc92ce7b193bd", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteCourse, "40ccc0a3956a500315848a9343d415371d73d4dcf2", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(processSyllabusAction, "60bd0a6a6fbf566136bd8e01509778d29d43df19af", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createSubmissionAction, "60262169a5b5349a23c0ba9e0de1f8c2583ccbe701", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteSyllabusAction, "40c5d260e06a26e8e357801a39d7cf9fb6cba0e0f7", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteSubmissionAction, "60255775f009031bf91ef603cc452a8bff463de37c", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(purgeCourseTelemetry, "4015c02ddc581c627060699c04369c69e5d1adde14", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createCourse, "40be85b1cd710716c1bd4c373f77aa6a6d97cc00ea", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteCourse, "405e3a5b7d9e840246a0ac847848e105325e85ccc8", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(processSyllabusAction, "60b78b8f240bccdad0763325ccbe14fe392fb73fda", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createSubmissionAction, "600915dea7e13b908f09d7a06b186ad569db2479ef", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteSyllabusAction, "409ec0327324ece2a48dae842673576075402ae1bb", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteSubmissionAction, "607c573bdd977e50b62cd4f4d0afb493f4448b4286", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(purgeCourseTelemetry, "40844cba3db84adc646afc473b4eda7b4dab4ca9cd", null);
 }),
 "[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
@@ -520,12 +558,269 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/app-render/encryption.js [app-rsc] (ecmascript)");
-/* __next_internal_action_entry_do_not_use__ [{"602eed04bba2f119c8c5886c061f76fa261b5e2342":"$$RSC_SERVER_ACTION_0"},"",""] */ var __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/drizzle/index.ts [app-rsc] (ecmascript)");
+// // import { db } from '@/drizzle/index';
+// // import { courses, submissions } from '@/drizzle/db/schema';
+// // import { eq, desc } from 'drizzle-orm';
+// // import { notFound } from 'next/navigation';
+// // import { GradeGauge } from '@/app/ui/GradeGauge';
+// // import { ProphetSidebar } from '@/app/ui/ProphetSidebar';
+// // import { AICard } from '@/app/ui/AICard';
+// // import CreateSubmissionBtn from '@/app/ui/CreateSubmissionBtn';
+// // import DeleteSyllabusBtn from '@/app/ui/DeleteSyllabusBtn';
+// // import FileUploader from '@/app/ui/FileUploader';
+// // import { processSyllabusAction } from '@/app/lib/actions';
+// // export default async function CourseDetailPage({ params }: { params: { id: string } }) {
+// //     const { id } = await params;
+// //     // 1. Fetch Course and latest Submissions
+// //     const course = await db.query.courses.findFirst({
+// //         where: eq(courses.id, id),
+// //     });
+// //     const allSubmissions = await db.query.submissions.findMany({
+// //         where: eq(submissions.courseId, id),
+// //         orderBy: [desc(submissions.createdAt)],
+// //     });
+// //     if (!course) notFound();
+// //     const latestSubmission = allSubmissions[0];
+// //     const milestones = (course.milestones as any[]) || [];
+// //     const currentGrade = course.currentGrade || 0;
+// //     return (
+// //         <div className="flex h-screen bg-[#020617] text-white overflow-hidden">
+// //             {/* LEFT: Neural Analysis Feed */}
+// //             <main className="flex-1 overflow-y-auto p-12 custom-scrollbar">
+// //                 <header className="flex justify-between items-start mb-12">
+// //                     <div>
+// //                         <h1 className="text-5xl font-black tracking-tighter uppercase italic text-white mb-2">
+// //                             {course.name}
+// //                         </h1>
+// //                         <p className="text-white/40 text-xs font-mono tracking-widest uppercase">
+// //                             Sector: ECE231 // Node: {id.slice(0, 8)}
+// //                         </p>
+// //                     </div>
+// //                     <div className="flex gap-4">
+// //                         <DeleteSyllabusBtn courseId={id} />
+// //                         <CreateSubmissionBtn courseId={id} userId="system-user" />
+// //                     </div>
+// //                 </header>
+// //                 {/* 2. SYLLABUS INITIALIZATION: Only show if no milestones exist */}
+// //                 {milestones.length === 0 ? (
+// //                     <div className="flex flex-col items-center justify-center h-[50vh] border-2 border-dashed border-white/10 rounded-[3rem] bg-white/[0.02]">
+// //                         <h3 className="text-xl font-black uppercase tracking-widest mb-6">Initialize Neural Roadmap</h3>
+// //                         <FileUploader
+// //                             bucket="uofthacks-2026"
+// //                             userID="system-user"
+// //                             courseID={id}
+// //                             folder="syllabus_files"
+// //                             onSuccess={async (path) => {
+// //                                 'use server';
+// //                                 await processSyllabusAction(id, path);
+// //                             }}
+// //                         />
+// //                     </div>
+// //                 ) : (
+// //                     <div className="space-y-8">
+// //                         <GradeGauge currentGrade={currentGrade} />
+// //                         <div className="space-y-6">
+// //                             <h2 className="text-xs font-black uppercase tracking-[0.4em] text-white/20">Neural Guidance Feed</h2>
+// //                             {/* 3. Display KCL/Diode AI Cards from Python Report */}
+// //                             {latestSubmission?.analysisReport?.map((item: any, idx: number) => (
+// //                                 <AICard
+// //                                     key={idx}
+// //                                     questionNumber={item.question_number}
+// //                                     detectedMistake={item.detected_error}
+// //                                     aiTip={item.study_tip}
+// //                                     unitId={item.unit_id}
+// //                                     delay={idx * 0.1}
+// //                                 />
+// //                             ))}
+// //                         </div>
+// //                     </div>
+// //                 )}
+// //             </main>
+// //             {/* RIGHT: Prophet Sidebar (Resonance & Chronology) */}
+// //             <aside className="w-[400px]">
+// //                 <ProphetSidebar
+// //                     milestones={milestones}
+// //                     currentGrade={currentGrade}
+// //                 />
+// //             </aside>
+// //         </div>
+// //     );
+// // }
+// // WORKING VERSION 2
+// import { db } from '@/drizzle/index';
+// import { courses, submissions } from '@/drizzle/db/schema';
+// import { eq, desc } from 'drizzle-orm';
+// import { notFound } from 'next/navigation';
+// import Link from 'next/link';
+// import * as motion from "framer-motion/client"; // Use client-side motion for Server Components
+// import { Cpu, ChevronRight } from 'lucide-react';
+// import { GradeGauge } from '@/app/ui/GradeGauge';
+// import { ProphetSidebar } from '@/app/ui/ProphetSidebar';
+// import { AICard } from '@/app/ui/AICard';
+// import CreateSubmissionBtn from '@/app/ui/CreateSubmissionBtn';
+// import DeleteSyllabusBtn from '@/app/ui/DeleteSyllabusBtn';
+// import FileUploader from '@/app/ui/FileUploader';
+// import { processSyllabusAction } from '@/app/lib/actions';
+// export default async function CourseDetailPage({ params }: { params: { id: string } }) {
+//     const { id } = await params;
+//     // 1. Fetch Course and latest Submissions
+//     const course = await db.query.courses.findFirst({
+//         where: eq(courses.id, id),
+//     });
+//     const allSubmissions = await db.query.submissions.findMany({
+//         where: eq(submissions.courseId, id),
+//         orderBy: [desc(submissions.createdAt)],
+//     });
+//     if (!course) notFound();
+//     const latestSubmission = allSubmissions[0];
+//     const milestones = (course.milestones as any[]) || [];
+//     const currentGrade = course.currentGrade || 0;
+//     // Logic: Submission is posted if at least one milestone has a score
+//     const hasSubmission = milestones.some(m => m.score !== undefined && m.score !== null);
+//     return (
+//         <div className="flex h-screen bg-[#020617] text-white overflow-hidden">
+//             {/* LEFT: Neural Analysis Feed */}
+//             <main className="flex-1 overflow-y-auto p-12 custom-scrollbar">
+//                 <header className="flex justify-between items-start mb-12">
+//                     <div>
+//                         <h1 className="text-5xl font-black tracking-tighter uppercase italic text-white mb-2">
+//                             {course.name}
+//                         </h1>
+//                         <p className="text-white/40 text-xs font-mono tracking-widest uppercase">
+//                             Sector: ECE231 // Node: {id.slice(0, 8)}
+//                         </p>
+//                     </div>
+//                     <div className="flex gap-4">
+//                         <DeleteSyllabusBtn courseId={id} />
+//                         <CreateSubmissionBtn courseId={id} userId="system-user" />
+//                     </div>
+//                 </header>
+//                 {/* 2. SYLLABUS INITIALIZATION */}
+//                 {milestones.length === 0 ? (
+//                     <div className="flex flex-col items-center justify-center h-[50vh] border-2 border-dashed border-white/10 rounded-[3rem] bg-white/[0.02]">
+//                         <h3 className="text-xl font-black uppercase tracking-widest mb-6">Initialize Neural Roadmap</h3>
+//                         <FileUploader
+//                             bucket="uofthacks-2026"
+//                             userID="system-user"
+//                             courseID={id}
+//                             folder="syllabus_files"
+//                             onSuccess={async (path) => {
+//                                 'use server';
+//                                 await processSyllabusAction(id, "system-user", path);
+//                             }}
+//                         />
+//                     </div>
+//                 ) : (
+//                     <div className="space-y-8">
+//                         <GradeGauge currentGrade={currentGrade} />
+//                         {/* 3. SYNTHETIC EXAM BUTTON (Condition: Submission Detected)
+//                         {hasSubmission && (
+//                             <Link href="/genQuestions">
+//                                 <motion.div 
+//                                     whileHover={{ scale: 1.02, backgroundColor: 'rgba(139, 92, 246, 0.1)' }}
+//                                     whileTap={{ scale: 0.98 }}
+//                                     className="group flex items-center justify-between p-4 rounded-2xl transition-all border bg-white/5 border-white/10 hover:border-[#8B5CF6]/40"
+//                                 >
+//                                     <div className="flex items-center gap-4">
+//                                         <div className="p-2.5 rounded-xl transition-colors bg-white/5 text-white/40 group-hover:text-[#8B5CF6]">
+//                                             <Cpu className="w-4 h-4" />
+//                                         </div>
+//                                         <div>
+//                                             <span className="block text-[11px] font-black uppercase tracking-widest text-white">Synthetic Exam</span>
+//                                             <span className="block text-[9px] text-emerald-400 font-mono uppercase tracking-tighter animate-pulse">Neural_Link_Active</span>
+//                                         </div>
+//                                     </div>
+//                                     <ChevronRight className="w-4 h-4 transition-all text-white/10 group-hover:text-[#8B5CF6] group-hover:translate-x-1" />
+//                                 </motion.div>
+//                             </Link>
+//                         )} */}
+//                         {/* 3. SYNTHETIC EXAM BUTTON: Refined N3XU$ Aesthetic */}
+//                         {hasSubmission && (
+//                             <Link href="/genQuestions">
+//                                 <motion.div 
+//                                     whileHover={{ scale: 1.01, borderColor: 'rgba(139, 92, 246, 0.5)' }}
+//                                     whileTap={{ scale: 0.99 }}
+//                                     className="group relative flex items-center justify-between p-6 rounded-[2rem] bg-white/[0.02] border border-white/10 backdrop-blur-md transition-all duration-500 hover:bg-white/[0.04] shadow-2xl"
+//                                 >
+//                                     {/* Inner Glow Effect */}
+//                                     <div className="absolute inset-0 bg-gradient-to-r from-[#8B5CF6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem]" />
+//                                     <div className="flex items-center gap-6 relative z-10">
+//                                         {/* Icon Container with Dual-Ring Border */}
+//                                         <div className="relative">
+//                                             <div className="absolute inset-0 bg-[#8B5CF6]/20 blur-xl rounded-full group-hover:bg-[#8B5CF6]/40 transition-colors" />
+//                                             <div className="relative p-4 rounded-2xl bg-[#0a0f1d] border border-white/10 group-hover:border-[#8B5CF6]/50 transition-colors">
+//                                                 <Cpu className="w-6 h-6 text-[#8B5CF6]" />
+//                                             </div>
+//                                         </div>
+//                                         <div>
+//                                             <div className="flex items-center gap-2 mb-1.5">
+//                                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
+//                                                 <span className="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-500/80 font-mono">
+//                                                     Neural Link: Active
+//                                                 </span>
+//                                             </div>
+//                                             <h3 className="text-xl font-black uppercase tracking-tighter text-white italic group-hover:text-[#8B5CF6] transition-colors">
+//                                                 Synthetic Practice Sector
+//                                             </h3>
+//                                             <p className="text-[10px] text-white/30 font-mono uppercase tracking-widest mt-0.5">
+//                                                 Generate schematics based on detected errors
+//                                             </p>
+//                                         </div>
+//                                     </div>
+//                                     <div className="flex flex-col items-end gap-1 relative z-10">
+//                                         <div className="flex items-center gap-2 text-white/20 group-hover:text-white transition-colors">
+//                                             <span className="text-[9px] font-black uppercase tracking-[0.2em]">Initialize</span>
+//                                             <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+//                                         </div>
+//                                         <div className="w-24 h-[1px] bg-white/5 overflow-hidden">
+//                                             <motion.div 
+//                                                 className="h-full bg-[#8B5CF6]"
+//                                                 animate={{ x: [-100, 100] }}
+//                                                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+//                                             />
+//                                         </div>
+//                                     </div>
+//                                 </motion.div>
+//                             </Link>
+//                         )}
+//                         <div className="space-y-6">
+//                             <br />
+//                             <h2 className="text-xs font-black uppercase tracking-[0.4em] text-white/20">Neural Guidance Feed</h2>
+//                             {/* 4. Display AI Cards */}
+//                             {latestSubmission?.analysisReport?.map((item: any, idx: number) => (
+//                                 <AICard
+//                                     key={idx}
+//                                     questionNumber={item.question_number}
+//                                     detectedMistake={item.detected_error}
+//                                     aiTip={item.study_tip}
+//                                     unitId={item.unit_id}
+//                                     delay={idx * 0.1}
+//                                 />
+//                             ))}
+//                         </div>
+//                     </div>
+//                 )}
+//             </main>
+//             {/* RIGHT: Prophet Sidebar */}
+//             <aside className="w-[400px]">
+//                 <ProphetSidebar
+//                     milestones={milestones}
+//                     currentGrade={currentGrade}
+//                 />
+//             </aside>
+//         </div>
+//     );
+// }
+/* __next_internal_action_entry_do_not_use__ [{"6063a1b274896340db4f2ba55d9b6105532a2ce1e2":"$$RSC_SERVER_ACTION_0"},"",""] */ var __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/drizzle/index.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$drizzle$2f$db$2f$schema$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/drizzle/db/schema.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$sql$2f$expressions$2f$conditions$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/drizzle-orm/sql/expressions/conditions.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$sql$2f$expressions$2f$select$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/drizzle-orm/sql/expressions/select.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$api$2f$navigation$2e$react$2d$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/next/dist/api/navigation.react-server.js [app-rsc] (ecmascript) <locals>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$components$2f$navigation$2e$react$2d$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/components/navigation.react-server.js [app-rsc] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$react$2d$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.react-server.js [app-rsc] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$elements$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__MotionDiv__as__div$3e$__ = __turbopack_context__.i("[project]/node_modules/framer-motion/dist/es/render/components/motion/elements.mjs [app-rsc] (ecmascript) <export MotionDiv as div>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$cpu$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__default__as__Cpu$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/cpu.js [app-rsc] (ecmascript) <export default as Cpu>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/chevron-right.js [app-rsc] (ecmascript) <export default as ChevronRight>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$ui$2f$GradeGauge$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/ui/GradeGauge.tsx [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$ui$2f$ProphetSidebar$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/ui/ProphetSidebar.tsx [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$ui$2f$AICard$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/ui/AICard.tsx [app-rsc] (ecmascript)");
@@ -547,11 +842,14 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx
 ;
 ;
 ;
+;
+;
+;
 const $$RSC_SERVER_ACTION_0 = async function onSuccess($$ACTION_CLOSURE_BOUND, path) {
-    var [$$ACTION_ARG_0] = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["decryptActionBoundArgs"])("602eed04bba2f119c8c5886c061f76fa261b5e2342", $$ACTION_CLOSURE_BOUND);
-    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["processSyllabusAction"])($$ACTION_ARG_0, path);
+    var [$$ACTION_ARG_0] = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["decryptActionBoundArgs"])("6063a1b274896340db4f2ba55d9b6105532a2ce1e2", $$ACTION_CLOSURE_BOUND);
+    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["processSyllabusAction"])($$ACTION_ARG_0, "system-user", path);
 };
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])($$RSC_SERVER_ACTION_0, "602eed04bba2f119c8c5886c061f76fa261b5e2342", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])($$RSC_SERVER_ACTION_0, "6063a1b274896340db4f2ba55d9b6105532a2ce1e2", null);
 async function CourseDetailPage({ params }) {
     const { id } = await params;
     // 1. Fetch Course and latest Submissions
@@ -568,6 +866,7 @@ async function CourseDetailPage({ params }) {
     const latestSubmission = allSubmissions[0];
     const milestones = course.milestones || [];
     const currentGrade = course.currentGrade || 0;
+    const hasSubmission = milestones.some((m)=>m.score !== undefined && m.score !== null);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "flex h-screen bg-[#020617] text-white overflow-hidden",
         children: [
@@ -580,28 +879,52 @@ async function CourseDetailPage({ params }) {
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                                        className: "text-5xl font-black tracking-tighter uppercase italic text-white mb-2",
+                                        className: "text-5xl font-black tracking-tighter uppercase italic text-white mb-2 leading-none",
                                         children: course.name
                                     }, void 0, false, {
                                         fileName: "[project]/app/course/[id]/page.tsx",
-                                        lineNumber: 38,
+                                        lineNumber: 322,
                                         columnNumber: 25
                                     }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-white/40 text-xs font-mono tracking-widest uppercase",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex items-center gap-3",
                                         children: [
-                                            "Sector: ECE231 // Node: ",
-                                            id.slice(0, 8)
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "px-2 py-0.5 rounded bg-[#8B5CF6]/20 border border-[#8B5CF6]/30",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                    className: "text-[#8B5CF6] text-[10px] font-black uppercase tracking-widest font-mono",
+                                                    children: [
+                                                        "ID: ",
+                                                        id
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/course/[id]/page.tsx",
+                                                    lineNumber: 327,
+                                                    columnNumber: 33
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/course/[id]/page.tsx",
+                                                lineNumber: 326,
+                                                columnNumber: 29
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-white/20 text-[10px] font-mono tracking-[0.3em] uppercase",
+                                                children: "Neural Node Active"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/course/[id]/page.tsx",
+                                                lineNumber: 331,
+                                                columnNumber: 29
+                                            }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/course/[id]/page.tsx",
-                                        lineNumber: 41,
+                                        lineNumber: 325,
                                         columnNumber: 25
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/course/[id]/page.tsx",
-                                lineNumber: 37,
+                                lineNumber: 321,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -611,7 +934,7 @@ async function CourseDetailPage({ params }) {
                                         courseId: id
                                     }, void 0, false, {
                                         fileName: "[project]/app/course/[id]/page.tsx",
-                                        lineNumber: 46,
+                                        lineNumber: 337,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$ui$2f$CreateSubmissionBtn$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
@@ -619,19 +942,19 @@ async function CourseDetailPage({ params }) {
                                         userId: "system-user"
                                     }, void 0, false, {
                                         fileName: "[project]/app/course/[id]/page.tsx",
-                                        lineNumber: 47,
+                                        lineNumber: 338,
                                         columnNumber: 25
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/course/[id]/page.tsx",
-                                lineNumber: 45,
+                                lineNumber: 336,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/course/[id]/page.tsx",
-                        lineNumber: 36,
+                        lineNumber: 320,
                         columnNumber: 17
                     }, this),
                     milestones.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -642,7 +965,7 @@ async function CourseDetailPage({ params }) {
                                 children: "Initialize Neural Roadmap"
                             }, void 0, false, {
                                 fileName: "[project]/app/course/[id]/page.tsx",
-                                lineNumber: 54,
+                                lineNumber: 345,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$ui$2f$FileUploader$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
@@ -650,16 +973,16 @@ async function CourseDetailPage({ params }) {
                                 userID: "system-user",
                                 courseID: id,
                                 folder: "syllabus_files",
-                                onSuccess: $$RSC_SERVER_ACTION_0.bind(null, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["encryptActionBoundArgs"])("602eed04bba2f119c8c5886c061f76fa261b5e2342", id))
+                                onSuccess: $$RSC_SERVER_ACTION_0.bind(null, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["encryptActionBoundArgs"])("6063a1b274896340db4f2ba55d9b6105532a2ce1e2", id))
                             }, void 0, false, {
                                 fileName: "[project]/app/course/[id]/page.tsx",
-                                lineNumber: 55,
+                                lineNumber: 346,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/course/[id]/page.tsx",
-                        lineNumber: 53,
+                        lineNumber: 344,
                         columnNumber: 21
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "space-y-8",
@@ -668,8 +991,183 @@ async function CourseDetailPage({ params }) {
                                 currentGrade: currentGrade
                             }, void 0, false, {
                                 fileName: "[project]/app/course/[id]/page.tsx",
-                                lineNumber: 68,
+                                lineNumber: 359,
                                 columnNumber: 25
+                            }, this),
+                            hasSubmission && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$react$2d$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
+                                href: `/genQuestions?courseId=${course.id}`,
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$elements$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__MotionDiv__as__div$3e$__["div"], {
+                                    whileHover: {
+                                        scale: 1.01,
+                                        borderColor: 'rgba(139, 92, 246, 0.5)'
+                                    },
+                                    whileTap: {
+                                        scale: 0.99
+                                    },
+                                    className: "group relative flex items-center justify-between p-6 rounded-[2.5rem] bg-white/[0.02] border border-white/10 backdrop-blur-md transition-all duration-500 hover:bg-white/[0.04] shadow-2xl",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "absolute inset-0 bg-gradient-to-r from-[#8B5CF6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem]"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                            lineNumber: 369,
+                                            columnNumber: 37
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex items-center gap-6 relative z-10",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "relative",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "absolute inset-0 bg-[#8B5CF6]/20 blur-xl rounded-full group-hover:bg-[#8B5CF6]/40 transition-colors"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                                            lineNumber: 373,
+                                                            columnNumber: 45
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "relative p-4 rounded-2xl bg-[#0a0f1d] border border-white/10 group-hover:border-[#8B5CF6]/50 transition-colors",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$cpu$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__default__as__Cpu$3e$__["Cpu"], {
+                                                                className: "w-6 h-6 text-[#8B5CF6]"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/course/[id]/page.tsx",
+                                                                lineNumber: 375,
+                                                                columnNumber: 49
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                                            lineNumber: 374,
+                                                            columnNumber: 45
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/course/[id]/page.tsx",
+                                                    lineNumber: 372,
+                                                    columnNumber: 41
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "flex items-center gap-2 mb-1.5",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/course/[id]/page.tsx",
+                                                                    lineNumber: 381,
+                                                                    columnNumber: 49
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "text-[9px] font-black uppercase tracking-[0.3em] text-emerald-500/80 font-mono",
+                                                                    children: "Neural Link: Active"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/course/[id]/page.tsx",
+                                                                    lineNumber: 382,
+                                                                    columnNumber: 49
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                                            lineNumber: 380,
+                                                            columnNumber: 45
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                            className: "text-xl font-black uppercase tracking-tighter text-white italic group-hover:text-[#8B5CF6] transition-colors",
+                                                            children: "Synthetic Practice Sector"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                                            lineNumber: 386,
+                                                            columnNumber: 45
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            className: "text-[10px] text-white/30 font-mono uppercase tracking-widest mt-0.5",
+                                                            children: "Generate schematics based on detected errors"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                                            lineNumber: 389,
+                                                            columnNumber: 45
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/course/[id]/page.tsx",
+                                                    lineNumber: 379,
+                                                    columnNumber: 41
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                            lineNumber: 371,
+                                            columnNumber: 37
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex flex-col items-end gap-1 relative z-10",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex items-center gap-2 text-white/20 group-hover:text-white transition-colors",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "text-[9px] font-black uppercase tracking-[0.2em]",
+                                                            children: "Initialize"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                                            lineNumber: 397,
+                                                            columnNumber: 45
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
+                                                            className: "w-5 h-5 group-hover:translate-x-1 transition-transform"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                                            lineNumber: 398,
+                                                            columnNumber: 45
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/course/[id]/page.tsx",
+                                                    lineNumber: 396,
+                                                    columnNumber: 41
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "w-24 h-[1px] bg-white/5 overflow-hidden",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$elements$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__MotionDiv__as__div$3e$__["div"], {
+                                                        className: "h-full bg-[#8B5CF6]",
+                                                        animate: {
+                                                            x: [
+                                                                -100,
+                                                                100
+                                                            ]
+                                                        },
+                                                        transition: {
+                                                            duration: 3,
+                                                            repeat: Infinity,
+                                                            ease: "linear"
+                                                        }
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/course/[id]/page.tsx",
+                                                        lineNumber: 401,
+                                                        columnNumber: 45
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/course/[id]/page.tsx",
+                                                    lineNumber: 400,
+                                                    columnNumber: 41
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/course/[id]/page.tsx",
+                                            lineNumber: 395,
+                                            columnNumber: 37
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/course/[id]/page.tsx",
+                                    lineNumber: 364,
+                                    columnNumber: 33
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/app/course/[id]/page.tsx",
+                                lineNumber: 363,
+                                columnNumber: 29
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-6",
@@ -679,7 +1177,7 @@ async function CourseDetailPage({ params }) {
                                         children: "Neural Guidance Feed"
                                     }, void 0, false, {
                                         fileName: "[project]/app/course/[id]/page.tsx",
-                                        lineNumber: 71,
+                                        lineNumber: 413,
                                         columnNumber: 29
                                     }, this),
                                     latestSubmission?.analysisReport?.map((item, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$ui$2f$AICard$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["AICard"], {
@@ -690,25 +1188,25 @@ async function CourseDetailPage({ params }) {
                                             delay: idx * 0.1
                                         }, idx, false, {
                                             fileName: "[project]/app/course/[id]/page.tsx",
-                                            lineNumber: 74,
+                                            lineNumber: 415,
                                             columnNumber: 33
                                         }, this))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/course/[id]/page.tsx",
-                                lineNumber: 70,
+                                lineNumber: 412,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/course/[id]/page.tsx",
-                        lineNumber: 67,
+                        lineNumber: 358,
                         columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/course/[id]/page.tsx",
-                lineNumber: 35,
+                lineNumber: 317,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
@@ -718,18 +1216,18 @@ async function CourseDetailPage({ params }) {
                     currentGrade: currentGrade
                 }, void 0, false, {
                     fileName: "[project]/app/course/[id]/page.tsx",
-                    lineNumber: 90,
+                    lineNumber: 430,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/course/[id]/page.tsx",
-                lineNumber: 89,
+                lineNumber: 429,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/course/[id]/page.tsx",
-        lineNumber: 33,
+        lineNumber: 315,
         columnNumber: 9
     }, this);
 }
@@ -755,21 +1253,21 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx
 "use strict";
 
 __turbopack_context__.s([
-    "4015c02ddc581c627060699c04369c69e5d1adde14",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["purgeCourseTelemetry"],
-    "4090343f00ed10f4472b943068f07dc92ce7b193bd",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createCourse"],
-    "40c5d260e06a26e8e357801a39d7cf9fb6cba0e0f7",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteSyllabusAction"],
-    "40ccc0a3956a500315848a9343d415371d73d4dcf2",
+    "405e3a5b7d9e840246a0ac847848e105325e85ccc8",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteCourse"],
-    "60255775f009031bf91ef603cc452a8bff463de37c",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteSubmissionAction"],
-    "60262169a5b5349a23c0ba9e0de1f8c2583ccbe701",
+    "40844cba3db84adc646afc473b4eda7b4dab4ca9cd",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["purgeCourseTelemetry"],
+    "409ec0327324ece2a48dae842673576075402ae1bb",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteSyllabusAction"],
+    "40be85b1cd710716c1bd4c373f77aa6a6d97cc00ea",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createCourse"],
+    "600915dea7e13b908f09d7a06b186ad569db2479ef",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createSubmissionAction"],
-    "602eed04bba2f119c8c5886c061f76fa261b5e2342",
+    "6063a1b274896340db4f2ba55d9b6105532a2ce1e2",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$course$2f5b$id$5d2f$page$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["$$RSC_SERVER_ACTION_0"],
-    "60bd0a6a6fbf566136bd8e01509778d29d43df19af",
+    "607c573bdd977e50b62cd4f4d0afb493f4448b4286",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteSubmissionAction"],
+    "60b78b8f240bccdad0763325ccbe14fe392fb73fda",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["processSyllabusAction"]
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$course$2f5b$id$5d2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$app$2f$course$2f5b$id$5d2f$page$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$app$2f$lib$2f$actions$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/course/[id]/page/actions.js { ACTIONS_MODULE0 => "[project]/app/course/[id]/page.tsx [app-rsc] (ecmascript)", ACTIONS_MODULE1 => "[project]/app/lib/actions.tsx [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <locals>');
