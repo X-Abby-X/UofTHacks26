@@ -9,7 +9,7 @@ CACHE_FILE = ".file_cache.json"
 
 
 class GeminiFileManager:
-        #def __init__(self, client):
+    # def __init__(self, client):
         # Prefer env var in real apps; allow passing key for dev
 
     def __init__(self, client: genai.Client):
@@ -68,7 +68,8 @@ class GeminiFileManager:
         print(f"Uploading {display_name or os.path.basename(file_path)}...")
         
         # New SDK upload
-        # docs show: myfile = client.files.upload(file="path/to/file")
+        #docs show
+        # myfile = self.client.files.upload(file="path/to/file")
         # V dun have client.files.upload
         upload_kwargs = {"file": file_path}
 

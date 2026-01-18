@@ -1,43 +1,44 @@
 import os, json
 from google import genai
-
+from config import API_KEY
 from gemini_client import GeminiFileManager
-from processor import AcademicProcessor, AcademicProcessor2, ExamProcessor
+from processor import AcademicProcessor2, ExamProcessor
 from tikz_renderer import render_tikz
 
 
 
-def run_feedback_system():
-    client = genai.Client(api_key=API_KEY)
+# def run_feedback_system():
+#     client = genai.Client(api_key=API_KEY)
 
-    manager = GeminiFileManager(client=client)
-    processor = AcademicProcessor(client=client)
+#     manager = GeminiFileManager(client=client)
+#     processor = AcademicProcessor(client=client)
 
-    files_to_upload = {
-        "syllabus": "files/syllabus.pdf",
-        "solutions": "files/midtermAnswers.pdf",
-        "student_exam": "files/midterm.pdf"
-    }
+#     files_to_upload = {
+#         "syllabus": "files/syllabus.pdf",
+#         "solutions": "files/midtermAnswers.pdf",
+#         "student_exam": "files/midterm.pdf"
+#     }
 
-    active_files = {}
-    for key, path in files_to_upload.items():
-        active_files[key] = manager.upload_and_wait(path, key.capitalize(), mime_type="application/pdf")
+#     active_files = {}
+#     for key, path in files_to_upload.items():
+#         active_files[key] = manager.upload_and_wait(path, key.capitalize(), mime_type="application/pdf")
 
-    print("\n--- [Pass 1] Distilling Syllabus ---")
-    knowledge_map = processor.extract_knowledge_map(active_files["syllabus"])
-    print("Knowledge Map Created successfully.")
+#     print("\n--- [Pass 1] Distilling Syllabus ---")
+#     knowledge_map = processor.extract_knowledge_map(active_files["syllabus"])
+#     print("Knowledge Map Created successfully.")
 
-    print("\n--- [Pass 2] Analyzing Midterm Performance ---")
-    final_report = processor.grade_midterm(
-        knowledge_map,
-        active_files["solutions"],
-        active_files["student_exam"],
-    )
+#     print("\n--- [Pass 2] Analyzing Midterm Performance ---")
+#     final_report = processor.grade_midterm(
+#         knowledge_map,
+#         active_files["solutions"],
+#         active_files["student_exam"],
+#     )
 
-    print("\n" + "=" * 50)
-    print("           STUDENT FEEDBACK REPORT")
-    print("=" * 50)
-    print(final_report)
+
+#     print("\n" + "=" * 50)
+#     print("           STUDENT FEEDBACK REPORT")
+#     print("=" * 50)
+#     print(final_report)
 
 
 def load_questions(json_path: str):
@@ -52,7 +53,7 @@ def save_questions(json_path: str, questions: dict):
 
 def main():
     os.makedirs("images", exist_ok=True)
-    json_path = "generated_questions.json"
+    json_path = "frontend/generated_questions.json"
 
     # ===== STEP 1: PRIMARY = LOAD JSON =====
     questions = load_questions(json_path)
@@ -71,8 +72,8 @@ def main():
             syl = mgr.upload_and_wait("files/syllabus.pdf", "Syllabus", "application/pdf")
             sol = mgr.upload_and_wait("files/midtermAnswers.pdf", "Solutions", "application/pdf")
 
-            k_map = procA.extract_knowledge_map(syl)
-            questions = procE.gen_question(k_map, sol)
+            # k_map = procA.extract_knowledge_map(syl)
+            # questions = procE.gen_question(k_map, sol)
 
             save_questions(json_path, questions)
             print(f"Saved generated questions to {json_path}.")
@@ -89,7 +90,7 @@ def main():
         img_data = q.get("image")
 
         if q.get("requires_image") and img_data and img_data.get("type") == "circuit":
-            path = f"images/question_{qid}.png"
+            path = f"frontend/public/images/question_{qid}.png"
 
             if not os.path.exists(path):
                 print(f"Rendering Q{qid} from JSON spec...")
@@ -103,5 +104,5 @@ def main():
     print("\nWorkflow Complete! Run 'python app.py' to view the results.")
 
 if __name__ == "__main__":
-    run_feedback_system()
+    # run_feedback_system()
     main()

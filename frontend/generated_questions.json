@@ -3,7 +3,7 @@
     {
       "question_id": 1,
       "unit": "Diodes and Diode Circuits",
-      "question_text": "The diodes in the circuit below are ideal. Determine the node voltages V_A, V_B and the currents I_R1, I_D1, and I_D2. (Node A is the junction of R1, D1; Node B is the junction of D1, R2, D2).",
+      "question_text": "For the ideal diode circuit shown, sketch the output voltage V_out for an input sinusoidal voltage V_in = 10sin(\u03c9t) V. Label all important voltage levels on your sketch.",
       "requires_image": true,
       "image": {
         "type": "circuit",
@@ -11,7 +11,7 @@
           "components": [
             {
               "type": "V",
-              "label": "V1 = 10V",
+              "label": "V_in",
               "start": [
                 0,
                 0
@@ -23,15 +23,38 @@
             },
             {
               "type": "R",
-              "label": "R1 = 2k\u03a9",
+              "label": "R1=1k\u03a9",
               "start": [
                 0,
                 4
               ],
               "end": [
-                4,
+                2,
                 4
               ]
+            },
+            {
+              "type": "short",
+              "start": [
+                2,
+                4
+              ],
+              "end": [
+                2,
+                6
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                2,
+                4
+              ],
+              "end": [
+                4,
+                4
+              ],
+              "label": "V_out"
             },
             {
               "type": "D",
@@ -46,72 +69,39 @@
               ]
             },
             {
-              "type": "R",
-              "label": "R2 = 3k\u03a9",
+              "type": "V",
+              "label": "5V",
               "start": [
                 6,
                 4
               ],
               "end": [
-                10,
-                4
+                6,
+                0
               ]
             },
             {
               "type": "D",
               "label": "D2",
               "start": [
-                6,
+                8,
                 4
               ],
               "end": [
-                6,
-                2
+                4,
+                4
               ]
             },
             {
               "type": "V",
-              "label": "V2 = 5V",
+              "label": "-5V",
               "start": [
-                6,
-                2
+                8,
+                0
               ],
               "end": [
-                6,
-                0
-              ]
-            },
-            {
-              "type": "short",
-              "start": [
-                10,
+                8,
                 4
-              ],
-              "end": [
-                10,
-                0
-              ]
-            },
-            {
-              "type": "short",
-              "start": [
-                6,
-                0
-              ],
-              "end": [
-                0,
-                0
-              ]
-            },
-            {
-              "type": "short",
-              "start": [
-                10,
-                0
-              ],
-              "end": [
-                0,
-                0
               ]
             },
             {
@@ -120,16 +110,30 @@
                 0,
                 0
               ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                6,
+                0
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                8,
+                0
+              ]
             }
           ]
         }
       },
-      "rendered_image_path": "public\\images\\question_1.png"
+      "rendered_image_path": "frontend\\public\\images\\question_1.png"
     },
     {
       "question_id": 2,
       "unit": "Diodes and Diode Circuits",
-      "question_text": "For the circuit shown, the diode is described by I_D = I_S(e^(V_D/V_T) - 1) where I_S = 0.5 \u03bcA and V_T = 25 mV. The input is V_in(t) = 5 + 0.01 sin(\u03c9t) V. a) Find the DC current through the diode. b) Find the small-signal resistance of the diode. c) Find the small-signal voltage across the diode.",
+      "question_text": "For the Zener regulator circuit shown, with V_s = 20 V, R_s = 1 k\u03a9, V_Z = 6.2 V, and r_z = 0, find the minimum load resistance R_L for which the Zener diode remains in breakdown. Assume I_ZK = 1 mA.",
       "requires_image": true,
       "image": {
         "type": "circuit",
@@ -137,7 +141,7 @@
           "components": [
             {
               "type": "V",
-              "label": "V_in(t)",
+              "label": "V_s",
               "start": [
                 0,
                 0
@@ -149,9 +153,20 @@
             },
             {
               "type": "R",
-              "label": "R = 1k\u03a9",
+              "label": "R_s=1k\u03a9",
               "start": [
                 0,
+                4
+              ],
+              "end": [
+                2,
+                4
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                2,
                 4
               ],
               "end": [
@@ -161,24 +176,38 @@
             },
             {
               "type": "D",
-              "label": "D1",
+              "label": "D_Z",
+              "start": [
+                4,
+                0
+              ],
+              "end": [
+                4,
+                4
+              ],
+              "flip": true,
+              "zener": true
+            },
+            {
+              "type": "R",
+              "label": "R_L",
               "start": [
                 4,
                 4
               ],
               "end": [
-                4,
-                0
+                6,
+                4
               ]
             },
             {
               "type": "short",
               "start": [
-                4,
-                0
+                6,
+                4
               ],
               "end": [
-                0,
+                6,
                 0
               ]
             },
@@ -188,16 +217,115 @@
                 0,
                 0
               ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                4,
+                0
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                6,
+                0
+              ]
             }
           ]
         }
       },
-      "rendered_image_path": "public\\images\\question_2.png"
+      "rendered_image_path": "frontend\\public\\images\\question_2.png"
     },
     {
       "question_id": 3,
-      "unit": "Operational Amplifiers (Op Amps)",
-      "question_text": "Design a non-inverting amplifier with a gain of 50 that can deliver a 5V signal to a 5 k\u03a9 load resistor. The Op Amp can supply a maximum output current of 1 mA. Clearly label the input, output, and all resistor values in your circuit diagram.",
+      "unit": "Operational Amplifiers (Op-Amps)",
+      "question_text": "An inverting amplifier has R_in = 10 k\u03a9 and R_f = 100 k\u03a9. If the op-amp has input offset voltage V_OS = 2 mV, input bias current I_B = 100 nA, and input offset current I_OS = 10 nA, calculate the worst-case output voltage V_out assuming zero input voltage V_in = 0 V.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            {
+              "type": "V",
+              "label": "V_in=0V",
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                0,
+                4
+              ]
+            },
+            {
+              "type": "R",
+              "label": "R_in=10k\u03a9",
+              "start": [
+                0,
+                4
+              ],
+              "end": [
+                2,
+                4
+              ]
+            },
+            {
+              "type": "opamp",
+              "label": "OpAmp",
+              "pos": [
+                4,
+                4
+              ],
+              "plus": [
+                4,
+                2
+              ],
+              "minus": [
+                2,
+                4
+              ],
+              "out": [
+                6,
+                4
+              ],
+              "show_label": true
+            },
+            {
+              "type": "R",
+              "label": "R_f=100k\u03a9",
+              "start": [
+                2,
+                4
+              ],
+              "end": [
+                6,
+                4
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                4,
+                2
+              ]
+            }
+          ]
+        }
+      },
+      "rendered_image_path": "frontend\\public\\images\\question_3.png"
+    },
+    {
+      "question_id": 4,
+      "unit": "Operational Amplifiers (Op-Amps)",
+      "question_text": "Design a non-inverting amplifier with a gain of 20. Use a standard ideal op-amp configuration. If the input resistance R1 is chosen to be 10 k\u03a9, what should be the value of the feedback resistor R2? Draw the circuit diagram.",
       "requires_image": true,
       "image": {
         "type": "circuit",
@@ -230,52 +358,56 @@
               "type": "opamp",
               "label": "OpAmp",
               "pos": [
+                4,
+                4
+              ],
+              "plus": [
                 2,
                 2
               ],
               "minus": [
                 4,
-                4
+                6
               ],
               "out": [
-                8,
-                4
+                6,
+                6
               ],
               "show_label": true
             },
             {
               "type": "R",
-              "label": "R_f",
+              "label": "R1=10k\u03a9",
               "start": [
                 4,
-                4
-              ],
-              "end": [
-                8,
-                4
-              ]
-            },
-            {
-              "type": "R",
-              "label": "R_g",
-              "start": [
-                4,
-                4
+                6
               ],
               "end": [
                 4,
-                0
+                2
               ]
             },
             {
               "type": "short",
               "start": [
                 4,
-                0
+                2
               ],
               "end": [
-                0,
+                4,
                 0
+              ]
+            },
+            {
+              "type": "R",
+              "label": "R2",
+              "start": [
+                4,
+                6
+              ],
+              "end": [
+                6,
+                6
               ]
             },
             {
@@ -286,122 +418,21 @@
               ]
             },
             {
-              "type": "R",
-              "label": "R_L",
-              "start": [
-                8,
-                4
-              ],
-              "end": [
-                8,
-                0
-              ]
-            }
-          ]
-        }
-      },
-      "rendered_image_path": "public\\images\\question_3.png"
-    },
-    {
-      "question_id": 4,
-      "unit": "Operational Amplifiers (Op Amps)",
-      "question_text": "The Op Amp in the circuit below has V_OS = 3 mV, I_B1 = 120 nA (current into positive input), and I_B2 = 100 nA (current into negative input). Calculate the worst-case output voltage V_out if the input V_in is grounded (0V). Assume 'worst-case' means V_out has the largest positive value. What value should R_g take to minimize the output voltage due to bias currents?",
-      "requires_image": true,
-      "image": {
-        "type": "circuit",
-        "spec": {
-          "components": [
-            {
-              "type": "short",
-              "start": [
-                0,
-                4
-              ],
-              "end": [
-                0,
-                0
-              ]
-            },
-            {
               "type": "ground",
               "start": [
-                0,
-                0
-              ]
-            },
-            {
-              "type": "R",
-              "label": "R_in = 100k\u03a9",
-              "start": [
-                0,
-                4
-              ],
-              "end": [
                 4,
-                4
-              ]
-            },
-            {
-              "type": "short",
-              "start": [
-                4,
-                4
-              ],
-              "end": [
-                4,
-                2
-              ]
-            },
-            {
-              "type": "opamp",
-              "label": "OpAmp",
-              "minus": [
-                4,
-                2
-              ],
-              "pos": [
-                4,
-                0
-              ],
-              "out": [
-                8,
-                2
-              ],
-              "show_label": true
-            },
-            {
-              "type": "R",
-              "label": "R_f = 1M\u03a9",
-              "start": [
-                4,
-                2
-              ],
-              "end": [
-                8,
-                2
-              ]
-            },
-            {
-              "type": "R",
-              "label": "R_g",
-              "start": [
-                4,
-                0
-              ],
-              "end": [
-                0,
                 0
               ]
             }
           ]
         }
       },
-      "rendered_image_path": "public\\images\\question_4.png"
+      "rendered_image_path": "frontend\\public\\images\\question_4.png"
     },
     {
       "question_id": 5,
       "unit": "Diodes and Diode Circuits",
-      "question_text": "For the Zener regulator circuit shown, V_in = 12V and R_S = 1k\u03a9. The Zener diode has V_Z = 5V and I_ZK = 1mA. Assume the Zener diode has a negligible small-signal resistance (r_z = 0) when operating in breakdown. Find the range of load resistance R_L for which the output voltage V_out remains regulated at 5V. What is the maximum load current I_L_max that can be drawn from the regulator?",
+      "question_text": "A half-wave rectifier circuit has an input sinusoidal voltage with a peak of 10 V and a frequency of 60 Hz. If a 100 \u00b5F capacitor filter is used across a 1 k\u03a9 load resistor, calculate the DC output voltage and the peak-to-peak ripple voltage. Assume an ideal diode.",
       "requires_image": true,
       "image": {
         "type": "circuit",
@@ -409,7 +440,7 @@
           "components": [
             {
               "type": "V",
-              "label": "V_in = 12V",
+              "label": "V_in",
               "start": [
                 0,
                 0
@@ -417,23 +448,36 @@
               "end": [
                 0,
                 4
-              ]
-            },
-            {
-              "type": "R",
-              "label": "R_S = 1k\u03a9",
-              "start": [
-                0,
-                4
               ],
-              "end": [
-                4,
-                4
-              ]
+              "ac": true
             },
             {
               "type": "D",
-              "label": "D_Z (V_Z=5V)",
+              "label": "D1",
+              "start": [
+                0,
+                4
+              ],
+              "end": [
+                2,
+                4
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                2,
+                4
+              ],
+              "end": [
+                4,
+                4
+              ],
+              "label": "V_out"
+            },
+            {
+              "type": "C",
+              "label": "C=100\u00b5F",
               "start": [
                 4,
                 4
@@ -445,7 +489,7 @@
             },
             {
               "type": "R",
-              "label": "R_L",
+              "label": "R_L=1k\u03a9",
               "start": [
                 4,
                 4
@@ -463,28 +507,6 @@
               ],
               "end": [
                 6,
-                0
-              ]
-            },
-            {
-              "type": "short",
-              "start": [
-                4,
-                0
-              ],
-              "end": [
-                0,
-                0
-              ]
-            },
-            {
-              "type": "short",
-              "start": [
-                6,
-                0
-              ],
-              "end": [
-                0,
                 0
               ]
             },
@@ -494,16 +516,30 @@
                 0,
                 0
               ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                4,
+                0
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                6,
+                0
+              ]
             }
           ]
         }
       },
-      "rendered_image_path": "public\\images\\question_5.png"
+      "rendered_image_path": "frontend\\public\\images\\question_5.png"
     },
     {
       "question_id": 6,
-      "unit": "Operational Amplifiers (Op Amps)",
-      "question_text": "Design a two-input summing amplifier with gains -2 and -3 for inputs V_1 and V_2 respectively, and an output voltage range of \u00b110V. Use a feedback resistor R_f = 100 k\u03a9. Clearly label all resistor values in your circuit diagram.",
+      "unit": "Operational Amplifiers (Op-Amps)",
+      "question_text": "Design a two-input summing amplifier using an ideal op-amp to produce an output V_out = -(2V_1 + 5V_2). If the feedback resistor R_f is 100 k\u03a9, what should be the values of the input resistors R_1 and R_2? Draw the circuit diagram.",
       "requires_image": true,
       "image": {
         "type": "circuit",
@@ -518,7 +554,7 @@
               ],
               "end": [
                 0,
-                2
+                4
               ]
             },
             {
@@ -526,11 +562,11 @@
               "label": "R1",
               "start": [
                 0,
-                2
+                4
               ],
               "end": [
                 2,
-                2
+                4
               ]
             },
             {
@@ -538,11 +574,11 @@
               "label": "V2",
               "start": [
                 0,
-                4
+                6
               ],
               "end": [
                 0,
-                6
+                8
               ]
             },
             {
@@ -550,7 +586,18 @@
               "label": "R2",
               "start": [
                 0,
-                6
+                8
+              ],
+              "end": [
+                2,
+                8
+              ]
+            },
+            {
+              "type": "short",
+              "start": [
+                2,
+                4
               ],
               "end": [
                 2,
@@ -561,62 +608,44 @@
               "type": "short",
               "start": [
                 2,
-                2
+                8
               ],
               "end": [
-                4,
-                4
-              ]
-            },
-            {
-              "type": "short",
-              "start": [
                 2,
                 6
-              ],
-              "end": [
-                4,
-                4
               ]
             },
             {
               "type": "opamp",
               "label": "OpAmp",
-              "minus": [
-                4,
-                4
-              ],
               "pos": [
                 4,
-                0
+                6
+              ],
+              "plus": [
+                4,
+                2
+              ],
+              "minus": [
+                2,
+                6
               ],
               "out": [
-                8,
-                4
+                6,
+                6
               ],
               "show_label": true
             },
             {
               "type": "R",
-              "label": "R_f",
+              "label": "R_f=100k\u03a9",
               "start": [
-                4,
-                4
+                2,
+                6
               ],
               "end": [
-                8,
-                4
-              ]
-            },
-            {
-              "type": "short",
-              "start": [
-                4,
-                0
-              ],
-              "end": [
-                0,
-                0
+                6,
+                6
               ]
             },
             {
@@ -625,11 +654,25 @@
                 0,
                 0
               ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                0,
+                6
+              ]
+            },
+            {
+              "type": "ground",
+              "start": [
+                4,
+                2
+              ]
             }
           ]
         }
       },
-      "rendered_image_path": "public\\images\\question_6.png"
+      "rendered_image_path": "frontend\\public\\images\\question_6.png"
     }
   ]
 }

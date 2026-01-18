@@ -1,0 +1,132 @@
+```json
+{
+  "questions": [
+    {
+      "question_id": 1,
+      "unit": "Diodes",
+      "question_text": "For the circuit with ideal diodes shown below, determine the node voltage $V_A$ and the current $I_D$ through the diode D1. Assume all voltage sources are ideal.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            { "type": "V", "label": "5V", "start": [0,0], "end": [0,4] },
+            { "type": "R", "label": "2kΩ", "start": [0,4], "end": [4,4] },
+            { "type": "D", "label": "D1", "start": [4,4], "end": [4,2] },
+            { "type": "R", "label": "1kΩ", "start": [4,2], "end": [6,2] },
+            { "type": "short", "start": [6,2], "end": [6,0] },
+            { "type": "short", "start": [4,0], "end": [0,0] },
+            { "type": "ground", "start": [0,0] }
+          ]
+        }
+      },
+      "rendered_image_path": "public\\images\\question_1.png"
+    },
+    {
+      "question_id": 2,
+      "unit": "Diodes",
+      "question_text": "A silicon diode with $I_S = 100 \text{ nA}$ and $V_T = 25 \text{ mV}$ is biased with a DC current of $5 \text{ mA}$. Calculate the diode's small-signal resistance $r_d$ at this operating point.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            { "type": "V", "label": "10V", "start": [0,0], "end": [0,4] },
+            { "type": "R", "label": "1kΩ", "start": [0,4], "end": [4,4] },
+            { "type": "D", "label": "D1", "start": [4,4], "end": [4,0] },
+            { "type": "short", "start": [4,0], "end": [0,0] },
+            { "type": "ground", "start": [0,0] }
+          ]
+        }
+      },
+      "rendered_image_path": "public\\images\\question_2.png"
+    },
+    {
+      "question_id": 3,
+      "unit": "Diodes",
+      "question_text": "For the diode limiter circuit shown below, sketch the output voltage $V_{out}$ for an input sinusoidal voltage $V_{in}(t) = 10 \sin(\omega t) \text{ V}$. Assume ideal diodes and $R_1 = R_2 = 1 \text{ k}\Omega$. Clearly label the maximum and minimum output voltage values.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            { "type": "V", "label": "$V_{in}$", "start": [0,0], "end": [0,4] },
+            { "type": "R", "label": "$R_1$", "start": [0,4], "end": [4,4] },
+            { "type": "D", "label": "D1", "start": [4,4], "end": [4,2] },
+            { "type": "R", "label": "$R_2$", "start": [4,2], "end": [6,2] },
+            { "type": "D", "label": "D2", "start": [4,2], "end": [4,0] },
+            { "type": "V", "label": "5V", "start": [6,2], "end": [6,0] },
+            { "type": "ground", "start": [0,0] }
+          ]
+        }
+      },
+      "rendered_image_path": "public\\images\\question_3.png"
+    },
+    {
+      "question_id": 4,
+      "unit": "Operational Amplifiers",
+      "question_text": "An Op Amp in the circuit below has $V_{OS} = 2 \text{ mV}$, $I_{B1} = 50 \text{ nA}$, and $I_{B2} = 40 \text{ nA}$. Calculate the worst-case output voltage, assuming the input voltage $V_{in}$ is $0 \text{ V}$ and $R_1 = 10 \text{ k}\Omega$, $R_2 = 100 \text{ k}\Omega$. Worst-case refers to the largest magnitude of output offset.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            { "type": "short", "start": [0,4], "end": [2,4] },
+            { "type": "opamp", "label": "OpAmp", "pos": [4,2], "minus": [2,4], "plus": [2,0], "out": [6,2], "show_label": true },
+            { "type": "R", "label": "$R_2$", "start": [6,2], "end": [4,4] },
+            { "type": "R", "label": "$R_1$", "start": [2,4], "end": [0,0] },
+            { "type": "short", "start": [2,0], "end": [0,0] },
+            { "type": "ground", "start": [0,0] }
+          ]
+        }
+      },
+      "rendered_image_path": "public\\images\\question_4.png"
+    },
+    {
+      "question_id": 5,
+      "unit": "Operational Amplifiers",
+      "question_text": "Design a noninverting amplifier with a voltage gain of 50. The amplifier must be able to deliver a $5 \text{ V}$ signal to a $5 \text{ k}\Omega$ load resistor. Your Op Amp can supply a maximum of $2 \text{ mA}$ output current. Draw your circuit, clearly indicate the input ($V_{in}$) and output ($V_{out}$) ports, and specify all resistor values, ensuring maximum current is drawn from the Op Amp at maximum output voltage.",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            { "type": "V", "label": "$V_{in}$", "start": [0,0], "end": [0,2] },
+            { "type": "short", "start": [0,2], "end": [2,2] },
+            { "type": "opamp", "label": "OpAmp", "pos": [4,2], "minus": [2,4], "plus": [2,2], "out": [6,2], "show_label": true },
+            { "type": "R", "label": "$R_f$", "start": [6,2], "end": [4,4] },
+            { "type": "R", "label": "$R_1$", "start": [2,4], "end": [0,4] },
+            { "type": "short", "start": [0,4], "end": [0,0] },
+            { "type": "R", "label": "$R_L$", "start": [6,2], "end": [8,2] },
+            { "type": "short", "start": [8,2], "end": [8,0] },
+            { "type": "ground", "start": [0,0] },
+            { "type": "ground", "start": [8,0] }
+          ]
+        }
+      },
+      "rendered_image_path": "public\\images\\question_5.png"
+    },
+    {
+      "question_id": 6,
+      "unit": "Diodes",
+      "question_text": "For the Zener regulator circuit shown below, with $V_Z = 6.8 \text{ V}$ and $r_z = 0$, what is the maximum load current $I_L$ that can be drawn while maintaining regulation if the Zener diode has a minimum operating current $I_{ZK} = 5 \text{ mA}$ and the input voltage $V_S = 12 \text{ V}$?",
+      "requires_image": true,
+      "image": {
+        "type": "circuit",
+        "spec": {
+          "components": [
+            { "type": "V", "label": "$V_S$", "start": [0,0], "end": [0,4] },
+            { "type": "R", "label": "470Ω", "start": [0,4], "end": [4,4] },
+            { "type": "D", "label": "Zener", "start": [4,4], "end": [4,2], "zener": true },
+            { "type": "R", "label": "$R_L$", "start": [4,2], "end": [6,2] },
+            { "type": "short", "start": [6,2], "end": [6,0] },
+            { "type": "short", "start": [4,0], "end": [0,0] },
+            { "type": "ground", "start": [0,0] }
+          ]
+        }
+      },
+      "rendered_image_path": "public\\images\\question_6.png"
+    }
+  ]
+}
+```
